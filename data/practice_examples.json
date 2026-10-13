@@ -1,0 +1,4349 @@
+{
+  "title": "New practice problems using Tables B.3 and B.4",
+  "version": 1,
+  "sourceLibrary": "library.json",
+  "units": {
+    "temperature": "°C",
+    "pressure": "kPa",
+    "tablePressure": "mmHg",
+    "amount": "mol"
+  },
+  "assumptions": [
+    "Ideal liquid solution and ideal-gas vapor for mixture calculations.",
+    "Raoult’s law: y_i P = x_i P_i^sat.",
+    "Table B.4 Antoine equation: log10(P_i^sat/mmHg)=A_i−B_i/(T/°C+C_i).",
+    "Convert mmHg to kPa using P_kPa=P_mmHg×101.325/760.",
+    "At a bubble point x=z; at a dew point y=z. These are separate boundary states, not the same equilibrium pair.",
+    "Every requested state and root lies inside the supplied property-data ranges; extrapolation is disabled."
+  ],
+  "equations": {
+    "bubblePressure": "P_b=sum(x_i Psat_i)",
+    "dewPressure": "P_d=1/sum(y_i/Psat_i)",
+    "bubbleTemperatureResidual": "sum(z_i Psat_i(T))−P=0",
+    "dewTemperatureResidual": "sum(z_i P/Psat_i(T))−1=0",
+    "flashResidual": "sum[z_i(K_i−1)/(1+beta(K_i−1))]=0",
+    "flashCompositions": "K_i=Psat_i/P; x_i=z_i/[1+beta(K_i−1)]; y_i=K_i x_i",
+    "leverRule": "beta=(z_1−x_1)/(y_1−x_1)"
+  },
+  "examples": [
+    {
+      "id": "aromatics",
+      "title": "Aromatic mixture: bubble and dew points",
+      "componentIds": [
+        "b4-benzene",
+        "b4-toluene",
+        "b4-ethylbenzene"
+      ],
+      "components": [
+        {
+          "id": "b4-benzene",
+          "name": "Benzene",
+          "z": 0.5,
+          "fit": {
+            "A": 6.89272,
+            "B": 1203.531,
+            "C": 219.888,
+            "tUnit": "C",
+            "pUnit": "mmHg",
+            "logBase": "10",
+            "minC": 14.5,
+            "maxC": 80.9,
+            "source": "Table B.4, user-provided image",
+            "starred": false
+          }
+        },
+        {
+          "id": "b4-toluene",
+          "name": "Toluene",
+          "z": 0.3,
+          "fit": {
+            "A": 6.95805,
+            "B": 1346.773,
+            "C": 219.693,
+            "tUnit": "C",
+            "pUnit": "mmHg",
+            "logBase": "10",
+            "minC": 35.3,
+            "maxC": 111.5,
+            "source": "Table B.4, user-provided image"
+          }
+        },
+        {
+          "id": "b4-ethylbenzene",
+          "name": "Ethylbenzene",
+          "z": 0.2,
+          "fit": {
+            "A": 6.9565,
+            "B": 1423.543,
+            "C": 213.091,
+            "tUnit": "C",
+            "pUnit": "mmHg",
+            "logBase": "10",
+            "minC": 56.5,
+            "maxC": 137.1,
+            "source": "Table B.4, user-provided image",
+            "starred": false
+          }
+        }
+      ],
+      "state": {
+        "T_C": 75,
+        "P_kPa": 40,
+        "totalMoles": 100
+      },
+      "z": [
+        0.5,
+        0.3,
+        0.2
+      ],
+      "commonValidIntervalsC": [
+        [
+          56.5,
+          80.9
+        ]
+      ],
+      "preset": {
+        "T": 75,
+        "P": 40,
+        "totalMoles": 100,
+        "mode": "pt",
+        "calculation": "bt",
+        "binaryZ": 0.5,
+        "extrapolate": false
+      },
+      "questions": [
+        {
+          "part": "a",
+          "prompt": "At 75°C, calculate each pure-component saturation pressure. For a liquid with x=(0.50,0.30,0.20), find the bubble pressure and the first vapor composition."
+        },
+        {
+          "part": "b",
+          "prompt": "In a separate experiment, start with vapor y=(0.50,0.30,0.20) at 75°C. Find the dew pressure and the first liquid-drop composition."
+        },
+        {
+          "part": "c",
+          "prompt": "For overall composition z=(0.50,0.30,0.20), find the bubble and dew temperatures at 40.00 kPa. At the bubble point use x=z; at the dew point use y=z. Report the incipient phase composition at each boundary."
+        },
+        {
+          "part": "d",
+          "prompt": "Determine the phase region of a 100.0 mol sample at 75°C and 40.00 kPa. Extension: calculate the amounts and compositions of its liquid and vapor phases."
+        }
+      ],
+      "answers": {
+        "pressureAtT": {
+          "psatKPa": [
+            86.35895968369721,
+            32.57353007210633,
+            13.80723426852696
+          ],
+          "bubbleTermsKPa": [
+            43.179479841848604,
+            9.772059021631899,
+            2.761446853705392
+          ],
+          "bubblePressureKPa": 55.712985717185894,
+          "bubbleVaporY": [
+            0.775034388949091,
+            0.1754000238155876,
+            0.04956558723532139
+          ],
+          "dewTermsPerKPa": [
+            0.0057897872071563375,
+            0.009209932093202842,
+            0.014485160178377797
+          ],
+          "dewPressureKPa": 33.915688911706425,
+          "dewLiquidX": [
+            0.1963646217828919,
+            0.3123611917710088,
+            0.49127418644609927
+          ]
+        },
+        "temperatureAtP": {
+          "bubble": {
+            "temperatureC": 65.2615683748387,
+            "psatKPa": [
+              62.65017089267607,
+              22.734233197765423,
+              9.273222953110041
+            ],
+            "partialPressuresKPa": [
+              31.325085446338036,
+              6.820269959329627,
+              1.8546445906220084
+            ],
+            "incipientComposition": [
+              0.7831271361584509,
+              0.17050674898324067,
+              0.046366114765550207
+            ],
+            "residual": -3.7103262684468064e-9,
+            "residualUnit": "kPa",
+            "trace": [
+              {
+                "iteration": 1,
+                "low": 56.5,
+                "high": 80.9,
+                "mid": 68.7,
+                "residual": 5.077077243264021
+              },
+              {
+                "iteration": 2,
+                "low": 56.5,
+                "high": 68.7,
+                "mid": 62.6,
+                "residual": -3.6053305451129702
+              },
+              {
+                "iteration": 3,
+                "low": 62.6,
+                "high": 68.7,
+                "mid": 65.65,
+                "residual": 0.549361186257272
+              },
+              {
+                "iteration": 4,
+                "low": 62.6,
+                "high": 65.65,
+                "mid": 64.125,
+                "residual": -1.5731621994705591
+              },
+              {
+                "iteration": 5,
+                "low": 64.125,
+                "high": 65.65,
+                "mid": 64.8875,
+                "residual": -0.523374283886632
+              },
+              {
+                "iteration": 6,
+                "low": 64.8875,
+                "high": 65.65,
+                "mid": 65.26875000000001,
+                "residual": 0.010102413820483491
+              },
+              {
+                "iteration": 7,
+                "low": 64.8875,
+                "high": 65.26875000000001,
+                "mid": 65.078125,
+                "residual": -0.2573558627444754
+              },
+              {
+                "iteration": 8,
+                "low": 65.078125,
+                "high": 65.26875000000001,
+                "mid": 65.1734375,
+                "residual": -0.12380705987538931
+              },
+              {
+                "iteration": 9,
+                "low": 65.1734375,
+                "high": 65.26875000000001,
+                "mid": 65.22109375000001,
+                "residual": -0.05689745110743161
+              },
+              {
+                "iteration": 10,
+                "low": 65.22109375000001,
+                "high": 65.26875000000001,
+                "mid": 65.24492187500002,
+                "residual": -0.023408806194389342
+              },
+              {
+                "iteration": 11,
+                "low": 65.24492187500002,
+                "high": 65.26875000000001,
+                "mid": 65.25683593750001,
+                "residual": -0.006656018766172167
+              },
+              {
+                "iteration": 12,
+                "low": 65.25683593750001,
+                "high": 65.26875000000001,
+                "mid": 65.26279296875,
+                "residual": 0.0017224917959168806
+              },
+              {
+                "iteration": 13,
+                "low": 65.25683593750001,
+                "high": 65.26279296875,
+                "mid": 65.25981445312502,
+                "residual": -0.0024669399071513
+              },
+              {
+                "iteration": 14,
+                "low": 65.25981445312502,
+                "high": 65.26279296875,
+                "mid": 65.26130371093751,
+                "residual": -0.0003722681625220048
+              },
+              {
+                "iteration": 15,
+                "low": 65.26130371093751,
+                "high": 65.26279296875,
+                "mid": 65.26204833984376,
+                "residual": 0.0006751007898202488
+              },
+              {
+                "iteration": 16,
+                "low": 65.26130371093751,
+                "high": 65.26204833984376,
+                "mid": 65.26167602539064,
+                "residual": 0.0001514135569635755
+              },
+              {
+                "iteration": 17,
+                "low": 65.26130371093751,
+                "high": 65.26167602539064,
+                "mid": 65.26148986816408,
+                "residual": -0.00011042799188487606
+              },
+              {
+                "iteration": 18,
+                "low": 65.26148986816408,
+                "high": 65.26167602539064,
+                "mid": 65.26158294677737,
+                "residual": 0.00002049261028247429
+              },
+              {
+                "iteration": 19,
+                "low": 65.26148986816408,
+                "high": 65.26158294677737,
+                "mid": 65.26153640747071,
+                "residual": -0.00004496773394180309
+              },
+              {
+                "iteration": 20,
+                "low": 65.26153640747071,
+                "high": 65.26158294677737,
+                "mid": 65.26155967712404,
+                "residual": -0.000012237572612150416
+              },
+              {
+                "iteration": 21,
+                "low": 65.26155967712404,
+                "high": 65.26158294677737,
+                "mid": 65.2615713119507,
+                "residual": 0.000004127516120888686
+              },
+              {
+                "iteration": 22,
+                "low": 65.26155967712404,
+                "high": 65.2615713119507,
+                "mid": 65.26156549453736,
+                "residual": -0.0000040550289384100324
+              },
+              {
+                "iteration": 23,
+                "low": 65.26156549453736,
+                "high": 65.2615713119507,
+                "mid": 65.26156840324404,
+                "residual": 3.6243442025352124e-8
+              },
+              {
+                "iteration": 24,
+                "low": 65.26156549453736,
+                "high": 65.26156840324404,
+                "mid": 65.2615669488907,
+                "residual": -0.000002009392794377618
+              },
+              {
+                "iteration": 25,
+                "low": 65.2615669488907,
+                "high": 65.26156840324404,
+                "mid": 65.26156767606737,
+                "residual": -9.865747330195518e-7
+              },
+              {
+                "iteration": 26,
+                "low": 65.26156767606737,
+                "high": 65.26156840324404,
+                "mid": 65.26156803965571,
+                "residual": -4.7516562773353144e-7
+              },
+              {
+                "iteration": 27,
+                "low": 65.26156803965571,
+                "high": 65.26156840324404,
+                "mid": 65.26156822144988,
+                "residual": -2.1946109285408966e-7
+              },
+              {
+                "iteration": 28,
+                "low": 65.26156822144988,
+                "high": 65.26156840324404,
+                "mid": 65.26156831234695,
+                "residual": -9.160882541436877e-8
+              },
+              {
+                "iteration": 29,
+                "low": 65.26156831234695,
+                "high": 65.26156840324404,
+                "mid": 65.2615683577955,
+                "residual": -2.7682688141794642e-8
+              },
+              {
+                "iteration": 30,
+                "low": 65.2615683577955,
+                "high": 65.26156840324404,
+                "mid": 65.26156838051978,
+                "residual": 4.2804160216292075e-9
+              },
+              {
+                "iteration": 31,
+                "low": 65.2615683577955,
+                "high": 65.26156838051978,
+                "mid": 65.26156836915763,
+                "residual": -1.1701132507369039e-8
+              },
+              {
+                "iteration": 32,
+                "low": 65.26156836915763,
+                "high": 65.26156838051978,
+                "mid": 65.2615683748387,
+                "residual": -3.7103262684468064e-9
+              }
+            ],
+            "fitIndices": [
+              0,
+              0,
+              0
+            ]
+          },
+          "dew": {
+            "temperatureC": 79.55456146150829,
+            "psatKPa": [
+              99.62876782097959,
+              38.23153860558409,
+              16.482006865642415
+            ],
+            "partialPressuresKPa": [
+              20,
+              12,
+              8
+            ],
+            "incipientComposition": [
+              0.2007452308949308,
+              0.313876983183912,
+              0.4853777859221991
+            ],
+            "residual": 1.0418332863082469e-12,
+            "residualUnit": "dimensionless",
+            "trace": [
+              {
+                "iteration": 1,
+                "low": 56.5,
+                "high": 80.9,
+                "mid": 68.7,
+                "residual": 0.49516846856376606
+              },
+              {
+                "iteration": 2,
+                "low": 68.7,
+                "high": 80.9,
+                "mid": 74.80000000000001,
+                "residual": 0.1881170766483875
+              },
+              {
+                "iteration": 3,
+                "low": 74.80000000000001,
+                "high": 80.9,
+                "mid": 77.85000000000001,
+                "residual": 0.0630409528999385
+              },
+              {
+                "iteration": 4,
+                "low": 77.85000000000001,
+                "high": 80.9,
+                "mid": 79.375,
+                "residual": 0.006426131454088768
+              },
+              {
+                "iteration": 5,
+                "low": 79.375,
+                "high": 80.9,
+                "mid": 80.1375,
+                "residual": -0.02052650381109311
+              },
+              {
+                "iteration": 6,
+                "low": 79.375,
+                "high": 80.1375,
+                "mid": 79.75625,
+                "residual": -0.0071595862212132655
+              },
+              {
+                "iteration": 7,
+                "low": 79.375,
+                "high": 79.75625,
+                "mid": 79.565625,
+                "residual": -0.00039433354558648936
+              },
+              {
+                "iteration": 8,
+                "low": 79.375,
+                "high": 79.565625,
+                "mid": 79.4703125,
+                "residual": 0.00300896509976889
+              },
+              {
+                "iteration": 9,
+                "low": 79.4703125,
+                "high": 79.565625,
+                "mid": 79.51796875,
+                "residual": 0.0013055863659894307
+              },
+              {
+                "iteration": 10,
+                "low": 79.51796875,
+                "high": 79.565625,
+                "mid": 79.54179687499999,
+                "residual": 0.0004551945628263887
+              },
+              {
+                "iteration": 11,
+                "low": 79.54179687499999,
+                "high": 79.565625,
+                "mid": 79.5537109375,
+                "residual": 0.0000303226098790077
+              },
+              {
+                "iteration": 12,
+                "low": 79.5537109375,
+                "high": 79.565625,
+                "mid": 79.55966796875,
+                "residual": -0.00018203243465619856
+              },
+              {
+                "iteration": 13,
+                "low": 79.5537109375,
+                "high": 79.55966796875,
+                "mid": 79.556689453125,
+                "residual": -0.00007586165507422749
+              },
+              {
+                "iteration": 14,
+                "low": 79.5537109375,
+                "high": 79.556689453125,
+                "mid": 79.5552001953125,
+                "residual": -0.00002277120839244695
+              },
+              {
+                "iteration": 15,
+                "low": 79.5537109375,
+                "high": 79.5552001953125,
+                "mid": 79.55445556640625,
+                "residual": 0.000003775279278084298
+              },
+              {
+                "iteration": 16,
+                "low": 79.55445556640625,
+                "high": 79.5552001953125,
+                "mid": 79.55482788085936,
+                "residual": -0.000009498069920788055
+              },
+              {
+                "iteration": 17,
+                "low": 79.55445556640625,
+                "high": 79.55482788085936,
+                "mid": 79.55464172363281,
+                "residual": -0.000002861421662281316
+              },
+              {
+                "iteration": 18,
+                "low": 79.55445556640625,
+                "high": 79.55464172363281,
+                "mid": 79.55454864501954,
+                "residual": 4.569222236128212e-7
+              },
+              {
+                "iteration": 19,
+                "low": 79.55454864501954,
+                "high": 79.55464172363281,
+                "mid": 79.55459518432617,
+                "residual": -0.0000012022513663501044
+              },
+              {
+                "iteration": 20,
+                "low": 79.55454864501954,
+                "high": 79.55459518432617,
+                "mid": 79.55457191467286,
+                "residual": -3.726649837609841e-7
+              },
+              {
+                "iteration": 21,
+                "low": 79.55454864501954,
+                "high": 79.55457191467286,
+                "mid": 79.5545602798462,
+                "residual": 4.212851667517725e-8
+              },
+              {
+                "iteration": 22,
+                "low": 79.5545602798462,
+                "high": 79.55457191467286,
+                "mid": 79.55456609725954,
+                "residual": -1.6526826007723372e-7
+              },
+              {
+                "iteration": 23,
+                "low": 79.5545602798462,
+                "high": 79.55456609725954,
+                "mid": 79.55456318855286,
+                "residual": -6.156987741867681e-8
+              },
+              {
+                "iteration": 24,
+                "low": 79.5545602798462,
+                "high": 79.55456318855286,
+                "mid": 79.55456173419952,
+                "residual": -9.720681592995106e-9
+              },
+              {
+                "iteration": 25,
+                "low": 79.5545602798462,
+                "high": 79.55456173419952,
+                "mid": 79.55456100702287,
+                "residual": 1.6203916430868048e-8
+              },
+              {
+                "iteration": 26,
+                "low": 79.55456100702287,
+                "high": 79.55456173419952,
+                "mid": 79.5545613706112,
+                "residual": 3.2416185291594957e-9
+              },
+              {
+                "iteration": 27,
+                "low": 79.5545613706112,
+                "high": 79.55456173419952,
+                "mid": 79.55456155240536,
+                "residual": -3.2395317539624102e-9
+              },
+              {
+                "iteration": 28,
+                "low": 79.5545613706112,
+                "high": 79.55456155240536,
+                "mid": 79.55456146150829,
+                "residual": 1.0418332863082469e-12
+              }
+            ],
+            "fitIndices": [
+              0,
+              0,
+              0
+            ]
+          }
+        },
+        "flashAtState": {
+          "phase": "two-phase",
+          "K": [
+            2.15897399209243,
+            0.8143382518026583,
+            0.345180856713174
+          ],
+          "beta": 0.727291038183921,
+          "x": [
+            0.2713098418945664,
+            0.34683288849479055,
+            0.3818572696107161
+          ],
+          "y": [
+            0.5857508924490781,
+            0.2824392880845141,
+            0.13180981946638043
+          ],
+          "vaporMoles": 72.7291038183921,
+          "liquidMoles": 27.270896181607895,
+          "componentLiquidMoles": [
+            7.3988625313551735,
+            9.45844369450862,
+            10.413589955746094
+          ],
+          "componentVaporMoles": [
+            42.60113746864483,
+            20.54155630549138,
+            9.586410044253903
+          ],
+          "sumX": 1.000000000000073,
+          "sumY": 0.9999999999999725,
+          "balanceError": 4.163336342344337e-17,
+          "trace": [
+            {
+              "iteration": 1,
+              "low": 0,
+              "high": 1,
+              "mid": 0.5,
+              "residual": 0.11076930304466495
+            },
+            {
+              "iteration": 2,
+              "low": 0.5,
+              "high": 1,
+              "mid": 0.75,
+              "residual": -0.012049494820795342
+            },
+            {
+              "iteration": 3,
+              "low": 0.5,
+              "high": 0.75,
+              "mid": 0.625,
+              "residual": 0.05135401576853321
+            },
+            {
+              "iteration": 4,
+              "low": 0.625,
+              "high": 0.75,
+              "mid": 0.6875,
+              "residual": 0.02046572101018529
+            },
+            {
+              "iteration": 5,
+              "low": 0.6875,
+              "high": 0.75,
+              "mid": 0.71875,
+              "residual": 0.00445779328823992
+            },
+            {
+              "iteration": 6,
+              "low": 0.71875,
+              "high": 0.75,
+              "mid": 0.734375,
+              "residual": -0.0037270441749429895
+            },
+            {
+              "iteration": 7,
+              "low": 0.71875,
+              "high": 0.734375,
+              "mid": 0.7265625,
+              "residual": 0.0003817472793028742
+            },
+            {
+              "iteration": 8,
+              "low": 0.7265625,
+              "high": 0.734375,
+              "mid": 0.73046875,
+              "residual": -0.001668453681693327
+            },
+            {
+              "iteration": 9,
+              "low": 0.7265625,
+              "high": 0.73046875,
+              "mid": 0.728515625,
+              "residual": -0.0006423173308927055
+            },
+            {
+              "iteration": 10,
+              "low": 0.7265625,
+              "high": 0.728515625,
+              "mid": 0.7275390625,
+              "residual": -0.00013002764997255278
+            },
+            {
+              "iteration": 11,
+              "low": 0.7265625,
+              "high": 0.7275390625,
+              "mid": 0.72705078125,
+              "residual": 0.00012592396032584663
+            },
+            {
+              "iteration": 12,
+              "low": 0.72705078125,
+              "high": 0.7275390625,
+              "mid": 0.727294921875,
+              "residual": -0.000002035783651321843
+            },
+            {
+              "iteration": 13,
+              "low": 0.72705078125,
+              "high": 0.727294921875,
+              "mid": 0.7271728515625,
+              "residual": 0.00006194810053389288
+            },
+            {
+              "iteration": 14,
+              "low": 0.7271728515625,
+              "high": 0.727294921875,
+              "mid": 0.72723388671875,
+              "residual": 0.00002995716187731423
+            },
+            {
+              "iteration": 15,
+              "low": 0.72723388671875,
+              "high": 0.727294921875,
+              "mid": 0.727264404296875,
+              "residual": 0.000013960940020374402
+            },
+            {
+              "iteration": 16,
+              "low": 0.727264404296875,
+              "high": 0.727294921875,
+              "mid": 0.7272796630859375,
+              "residual": 0.000005962640917456241
+            },
+            {
+              "iteration": 17,
+              "low": 0.7272796630859375,
+              "high": 0.727294921875,
+              "mid": 0.7272872924804688,
+              "residual": 0.0000019634443170768456
+            },
+            {
+              "iteration": 18,
+              "low": 0.7272872924804688,
+              "high": 0.727294921875,
+              "mid": 0.7272911071777344,
+              "residual": -3.616574600906475e-8
+            },
+            {
+              "iteration": 19,
+              "low": 0.7272872924804688,
+              "high": 0.7272911071777344,
+              "mid": 0.7272891998291016,
+              "residual": 9.6364026580531e-7
+            },
+            {
+              "iteration": 20,
+              "low": 0.7272891998291016,
+              "high": 0.7272911071777344,
+              "mid": 0.727290153503418,
+              "residual": 4.6373750495209975e-7
+            },
+            {
+              "iteration": 21,
+              "low": 0.727290153503418,
+              "high": 0.7272911071777344,
+              "mid": 0.7272906303405762,
+              "residual": 2.1378594078358404e-7
+            },
+            {
+              "iteration": 22,
+              "low": 0.7272906303405762,
+              "high": 0.7272911071777344,
+              "mid": 0.7272908687591553,
+              "residual": 8.881011270833739e-8
+            },
+            {
+              "iteration": 23,
+              "low": 0.7272908687591553,
+              "high": 0.7272911071777344,
+              "mid": 0.7272909879684448,
+              "residual": 2.6322187152150178e-8
+            },
+            {
+              "iteration": 24,
+              "low": 0.7272909879684448,
+              "high": 0.7272911071777344,
+              "mid": 0.7272910475730896,
+              "residual": -4.9217784292565625e-9
+            },
+            {
+              "iteration": 25,
+              "low": 0.7272909879684448,
+              "high": 0.7272910475730896,
+              "mid": 0.7272910177707672,
+              "residual": 1.0700204555735837e-8
+            },
+            {
+              "iteration": 26,
+              "low": 0.7272910177707672,
+              "high": 0.7272910475730896,
+              "mid": 0.7272910326719284,
+              "residual": 2.889213090995213e-9
+            },
+            {
+              "iteration": 27,
+              "low": 0.7272910326719284,
+              "high": 0.7272910475730896,
+              "mid": 0.727291040122509,
+              "residual": -1.0162826691306748e-9
+            },
+            {
+              "iteration": 28,
+              "low": 0.7272910326719284,
+              "high": 0.727291040122509,
+              "mid": 0.7272910363972187,
+              "residual": 9.364651831766935e-10
+            },
+            {
+              "iteration": 29,
+              "low": 0.7272910363972187,
+              "high": 0.727291040122509,
+              "mid": 0.7272910382598639,
+              "residual": -3.990868746583942e-11
+            },
+            {
+              "iteration": 30,
+              "low": 0.7272910363972187,
+              "high": 0.7272910382598639,
+              "mid": 0.7272910373285413,
+              "residual": 4.48278247855427e-10
+            },
+            {
+              "iteration": 31,
+              "low": 0.7272910373285413,
+              "high": 0.7272910382598639,
+              "mid": 0.7272910377942026,
+              "residual": 2.0418472468364257e-10
+            },
+            {
+              "iteration": 32,
+              "low": 0.7272910377942026,
+              "high": 0.7272910382598639,
+              "mid": 0.7272910380270332,
+              "residual": 8.213801860890158e-11
+            },
+            {
+              "iteration": 33,
+              "low": 0.7272910380270332,
+              "high": 0.7272910382598639,
+              "mid": 0.7272910381434485,
+              "residual": 2.1114665571531077e-11
+            },
+            {
+              "iteration": 34,
+              "low": 0.7272910381434485,
+              "high": 0.7272910382598639,
+              "mid": 0.7272910382016562,
+              "residual": -9.397038702729787e-12
+            },
+            {
+              "iteration": 35,
+              "low": 0.7272910381434485,
+              "high": 0.7272910382016562,
+              "mid": 0.7272910381725524,
+              "residual": 5.8587579232494136e-12
+            },
+            {
+              "iteration": 36,
+              "low": 0.7272910381725524,
+              "high": 0.7272910382016562,
+              "mid": 0.7272910381871043,
+              "residual": -1.769140389740187e-12
+            },
+            {
+              "iteration": 37,
+              "low": 0.7272910381725524,
+              "high": 0.7272910381871043,
+              "mid": 0.7272910381798283,
+              "residual": 2.0448642779058446e-12
+            },
+            {
+              "iteration": 38,
+              "low": 0.7272910381798283,
+              "high": 0.7272910381871043,
+              "mid": 0.7272910381834663,
+              "residual": 1.3788969965844444e-13
+            },
+            {
+              "iteration": 39,
+              "low": 0.7272910381834663,
+              "high": 0.7272910381871043,
+              "mid": 0.7272910381852853,
+              "residual": -8.156253450408713e-13
+            },
+            {
+              "iteration": 40,
+              "low": 0.7272910381834663,
+              "high": 0.7272910381852853,
+              "mid": 0.7272910381843758,
+              "residual": -3.3889557826682903e-13
+            },
+            {
+              "iteration": 41,
+              "low": 0.7272910381834663,
+              "high": 0.7272910381843758,
+              "mid": 0.727291038183921,
+              "residual": -1.0047518372857667e-13
+            }
+          ]
+        }
+      },
+      "verification": {
+        "allRequestedTemperaturesSupported": true,
+        "extrapolationsUsed": 0,
+        "phaseAtBothComputedBoundariesCorrect": true
+      }
+    },
+    {
+      "id": "binary",
+      "title": "Benzene + toluene: P–x–y and T–x–y diagrams",
+      "componentIds": [
+        "b4-benzene",
+        "b4-toluene"
+      ],
+      "components": [
+        {
+          "id": "b4-benzene",
+          "name": "Benzene",
+          "z": 0.5,
+          "fit": {
+            "A": 6.89272,
+            "B": 1203.531,
+            "C": 219.888,
+            "tUnit": "C",
+            "pUnit": "mmHg",
+            "logBase": "10",
+            "minC": 14.5,
+            "maxC": 80.9,
+            "source": "Table B.4, user-provided image",
+            "starred": false
+          }
+        },
+        {
+          "id": "b4-toluene",
+          "name": "Toluene",
+          "z": 0.5,
+          "fit": {
+            "A": 6.95805,
+            "B": 1346.773,
+            "C": 219.693,
+            "tUnit": "C",
+            "pUnit": "mmHg",
+            "logBase": "10",
+            "minC": 35.3,
+            "maxC": 111.5,
+            "source": "Table B.4, user-provided image"
+          }
+        }
+      ],
+      "state": {
+        "T_C": 60,
+        "P_kPa": 30,
+        "totalMoles": 100
+      },
+      "z": [
+        0.5,
+        0.5
+      ],
+      "commonValidIntervalsC": [
+        [
+          35.3,
+          80.9
+        ]
+      ],
+      "preset": {
+        "T": 60,
+        "P": 30,
+        "totalMoles": 100,
+        "mode": "pxy",
+        "calculation": "bp",
+        "binaryZ": 0.5,
+        "extrapolate": false
+      },
+      "questions": [
+        {
+          "part": "a",
+          "prompt": "At 60°C, construct a P–x–y table at x_B=0,0.20,0.40,0.60,0.80,1.00. For each row calculate P=x_B P_B^sat+(1−x_B)P_T^sat and y_B=x_B P_B^sat/P. Plot P versus x_B and P versus y_B."
+        },
+        {
+          "part": "b",
+          "prompt": "At 30.00 kPa, construct a T–x–y table at the same six liquid compositions. Solve the bubble-temperature equation for every row, then calculate y_B. Plot T versus x_B and T versus y_B."
+        },
+        {
+          "part": "c",
+          "prompt": "A 100.0 mol mixture with z_B=0.500 is at 60°C and 30.00 kPa. Use a horizontal tie line to find x_B and y_B, then use the lever rule to find liquid and vapor amounts."
+        },
+        {
+          "part": "d",
+          "prompt": "For z_B=0.500 at 30.00 kPa, calculate the bubble and dew temperatures and identify where the state in part (c) lies between them."
+        }
+      ],
+      "answers": {
+        "pressureAtT": {
+          "psatKPa": [
+            52.18888304647294,
+            18.5255002585812
+          ],
+          "bubbleTermsKPa": [
+            26.09444152323647,
+            9.2627501292906
+          ],
+          "bubblePressureKPa": 35.35719165252707,
+          "bubbleVaporY": [
+            0.7380235902126981,
+            0.26197640978730186
+          ],
+          "dewTermsPerKPa": [
+            0.009580584423597686,
+            0.026989824459309534
+          ],
+          "dewPressureKPa": 27.344512422648734,
+          "dewLiquidX": [
+            0.2619764097873019,
+            0.7380235902126983
+          ]
+        },
+        "temperatureAtP": {
+          "bubble": {
+            "temperatureC": 55.56800953289495,
+            "psatKPa": [
+              44.50325612644408,
+              15.496743871271157
+            ],
+            "partialPressuresKPa": [
+              22.25162806322204,
+              7.7483719356355785
+            ],
+            "incipientComposition": [
+              0.7417209354407347,
+              0.25827906452118593
+            ],
+            "residual": -1.1423821888456587e-9,
+            "residualUnit": "kPa",
+            "trace": [
+              {
+                "iteration": 1,
+                "low": 35.3,
+                "high": 80.9,
+                "mid": 58.1,
+                "residual": 2.973272336417587
+              },
+              {
+                "iteration": 2,
+                "low": 35.3,
+                "high": 58.1,
+                "mid": 46.7,
+                "residual": -8.751979701081673
+              },
+              {
+                "iteration": 3,
+                "low": 46.7,
+                "high": 58.1,
+                "mid": 52.400000000000006,
+                "residual": -3.4104554637431406
+              },
+              {
+                "iteration": 4,
+                "low": 52.400000000000006,
+                "high": 58.1,
+                "mid": 55.25,
+                "residual": -0.35755712113432025
+              },
+              {
+                "iteration": 5,
+                "low": 55.25,
+                "high": 58.1,
+                "mid": 56.675,
+                "residual": 1.2719940702304733
+              },
+              {
+                "iteration": 6,
+                "low": 55.25,
+                "high": 56.675,
+                "mid": 55.9625,
+                "residual": 0.4483944529843775
+              },
+              {
+                "iteration": 7,
+                "low": 55.25,
+                "high": 55.9625,
+                "mid": 55.60625,
+                "residual": 0.043230254150561365
+              },
+              {
+                "iteration": 8,
+                "low": 55.25,
+                "high": 55.60625,
+                "mid": 55.428125,
+                "residual": -0.15770834595002015
+              },
+              {
+                "iteration": 9,
+                "low": 55.428125,
+                "high": 55.60625,
+                "mid": 55.517187500000006,
+                "residual": -0.057375547435519536
+              },
+              {
+                "iteration": 10,
+                "low": 55.517187500000006,
+                "high": 55.60625,
+                "mid": 55.561718750000004,
+                "residual": -0.007106806238226682
+              },
+              {
+                "iteration": 11,
+                "low": 55.561718750000004,
+                "high": 55.60625,
+                "mid": 55.583984375,
+                "residual": 0.018053179778668493
+              },
+              {
+                "iteration": 12,
+                "low": 55.561718750000004,
+                "high": 55.583984375,
+                "mid": 55.572851562500006,
+                "residual": 0.005471051260798276
+              },
+              {
+                "iteration": 13,
+                "low": 55.561718750000004,
+                "high": 55.572851562500006,
+                "mid": 55.56728515625001,
+                "residual": -0.0008184112992211112
+              },
+              {
+                "iteration": 14,
+                "low": 55.56728515625001,
+                "high": 55.572851562500006,
+                "mid": 55.57006835937501,
+                "residual": 0.0023261865198449527
+              },
+              {
+                "iteration": 15,
+                "low": 55.56728515625001,
+                "high": 55.57006835937501,
+                "mid": 55.56867675781251,
+                "residual": 0.0007538542460778785
+              },
+              {
+                "iteration": 16,
+                "low": 55.56728515625001,
+                "high": 55.56867675781251,
+                "mid": 55.56798095703126,
+                "residual": -0.00003228686745870846
+              },
+              {
+                "iteration": 17,
+                "low": 55.56798095703126,
+                "high": 55.56867675781251,
+                "mid": 55.56832885742189,
+                "residual": 0.0003607816041082401
+              },
+              {
+                "iteration": 18,
+                "low": 55.56798095703126,
+                "high": 55.56832885742189,
+                "mid": 55.56815490722657,
+                "residual": 0.0001642468469960079
+              },
+              {
+                "iteration": 19,
+                "low": 55.56798095703126,
+                "high": 55.56815490722657,
+                "mid": 55.56806793212891,
+                "residual": 0.0000659798594213612
+              },
+              {
+                "iteration": 20,
+                "low": 55.56798095703126,
+                "high": 55.56806793212891,
+                "mid": 55.56802444458009,
+                "residual": 0.000016846463392283795
+              },
+              {
+                "iteration": 21,
+                "low": 55.56798095703126,
+                "high": 55.56802444458009,
+                "mid": 55.56800270080568,
+                "residual": -0.000007720210135175876
+              },
+              {
+                "iteration": 22,
+                "low": 55.56800270080568,
+                "high": 55.56802444458009,
+                "mid": 55.568013572692884,
+                "residual": 0.00000456312457686181
+              },
+              {
+                "iteration": 23,
+                "low": 55.56800270080568,
+                "high": 55.568013572692884,
+                "mid": 55.568008136749285,
+                "residual": -0.0000015785433014059436
+              },
+              {
+                "iteration": 24,
+                "low": 55.568008136749285,
+                "high": 55.568013572692884,
+                "mid": 55.56801085472108,
+                "residual": 0.0000014922904689740335
+              },
+              {
+                "iteration": 25,
+                "low": 55.568008136749285,
+                "high": 55.56801085472108,
+                "mid": 55.56800949573518,
+                "residual": -4.3126409110527675e-8
+              },
+              {
+                "iteration": 26,
+                "low": 55.56800949573518,
+                "high": 55.56801085472108,
+                "mid": 55.56801017522813,
+                "residual": 7.245820121681845e-7
+              },
+              {
+                "iteration": 27,
+                "low": 55.56800949573518,
+                "high": 55.56801017522813,
+                "mid": 55.56800983548166,
+                "residual": 3.407278015288284e-7
+              },
+              {
+                "iteration": 28,
+                "low": 55.56800949573518,
+                "high": 55.56800983548166,
+                "mid": 55.56800966560842,
+                "residual": 1.4880063048394732e-7
+              },
+              {
+                "iteration": 29,
+                "low": 55.56800949573518,
+                "high": 55.56800966560842,
+                "mid": 55.5680095806718,
+                "residual": 5.2837101804925624e-8
+              },
+              {
+                "iteration": 30,
+                "low": 55.56800949573518,
+                "high": 55.5680095806718,
+                "mid": 55.56800953820349,
+                "residual": 4.855333912701099e-9
+              },
+              {
+                "iteration": 31,
+                "low": 55.56800949573518,
+                "high": 55.56800953820349,
+                "mid": 55.56800951696934,
+                "residual": -1.9135551809768003e-8
+              },
+              {
+                "iteration": 32,
+                "low": 55.56800951696934,
+                "high": 55.56800953820349,
+                "mid": 55.56800952758641,
+                "residual": -7.1401231593881676e-9
+              },
+              {
+                "iteration": 33,
+                "low": 55.56800952758641,
+                "high": 55.56800953820349,
+                "mid": 55.56800953289495,
+                "residual": -1.1423821888456587e-9
+              }
+            ],
+            "fitIndices": [
+              0,
+              0
+            ]
+          },
+          "dew": {
+            "temperatureC": 62.426968571078035,
+            "psatKPa": [
+              56.82560515533623,
+              20.37947984719183
+            ],
+            "partialPressuresKPa": [
+              15,
+              15
+            ],
+            "incipientComposition": [
+              0.2639655127120352,
+              0.7360344872622894
+            ],
+            "residual": -2.567546175669122e-11,
+            "residualUnit": "dimensionless",
+            "trace": [
+              {
+                "iteration": 1,
+                "low": 35.3,
+                "high": 80.9,
+                "mid": 58.1,
+                "residual": 0.1810260329908009
+              },
+              {
+                "iteration": 2,
+                "low": 58.1,
+                "high": 80.9,
+                "mid": 69.5,
+                "residual": -0.22981477429623465
+              },
+              {
+                "iteration": 3,
+                "low": 58.1,
+                "high": 69.5,
+                "mid": 63.8,
+                "residual": -0.050407152563896385
+              },
+              {
+                "iteration": 4,
+                "low": 58.1,
+                "high": 63.8,
+                "mid": 60.95,
+                "residual": 0.057819180475846554
+              },
+              {
+                "iteration": 5,
+                "low": 60.95,
+                "high": 63.8,
+                "mid": 62.375,
+                "residual": 0.001969602705460982
+              },
+              {
+                "iteration": 6,
+                "low": 62.375,
+                "high": 63.8,
+                "mid": 63.0875,
+                "residual": -0.024637067009588787
+              },
+              {
+                "iteration": 7,
+                "low": 62.375,
+                "high": 63.0875,
+                "mid": 62.73125,
+                "residual": -0.011440230729809597
+              },
+              {
+                "iteration": 8,
+                "low": 62.375,
+                "high": 62.73125,
+                "mid": 62.553125,
+                "residual": -0.0047621837039484305
+              },
+              {
+                "iteration": 9,
+                "low": 62.375,
+                "high": 62.553125,
+                "mid": 62.4640625,
+                "residual": -0.0014030388297985308
+              },
+              {
+                "iteration": 10,
+                "low": 62.375,
+                "high": 62.4640625,
+                "mid": 62.41953125,
+                "residual": 0.0002815909742990286
+              },
+              {
+                "iteration": 11,
+                "low": 62.41953125,
+                "high": 62.4640625,
+                "mid": 62.441796874999994,
+                "residual": -0.0005611461827383923
+              },
+              {
+                "iteration": 12,
+                "low": 62.41953125,
+                "high": 62.441796874999994,
+                "mid": 62.4306640625,
+                "residual": -0.0001398832286552132
+              },
+              {
+                "iteration": 13,
+                "low": 62.41953125,
+                "high": 62.4306640625,
+                "mid": 62.42509765625,
+                "residual": 0.00007082745912234678
+              },
+              {
+                "iteration": 14,
+                "low": 62.42509765625,
+                "high": 62.4306640625,
+                "mid": 62.427880859375,
+                "residual": -0.00003453448724077823
+              },
+              {
+                "iteration": 15,
+                "low": 62.42509765625,
+                "high": 62.427880859375,
+                "mid": 62.426489257812506,
+                "residual": 0.000018144835203459664
+              },
+              {
+                "iteration": 16,
+                "low": 62.426489257812506,
+                "high": 62.427880859375,
+                "mid": 62.42718505859375,
+                "residual": -0.000008195238688335493
+              },
+              {
+                "iteration": 17,
+                "low": 62.426489257812506,
+                "high": 62.42718505859375,
+                "mid": 62.42683715820313,
+                "residual": 0.000004974695087867076
+              },
+              {
+                "iteration": 18,
+                "low": 62.42683715820313,
+                "high": 62.42718505859375,
+                "mid": 62.42701110839844,
+                "residual": -0.0000016102975917142714
+              },
+              {
+                "iteration": 19,
+                "low": 62.42683715820313,
+                "high": 62.42701110839844,
+                "mid": 62.42692413330079,
+                "residual": 0.0000016821922990128968
+              },
+              {
+                "iteration": 20,
+                "low": 62.42692413330079,
+                "high": 62.42701110839844,
+                "mid": 62.42696762084961,
+                "residual": 3.5945742382637036e-8
+              },
+              {
+                "iteration": 21,
+                "low": 62.42696762084961,
+                "high": 62.42701110839844,
+                "mid": 62.42698936462402,
+                "residual": -7.871763274547305e-7
+              },
+              {
+                "iteration": 22,
+                "low": 62.42696762084961,
+                "high": 62.42698936462402,
+                "mid": 62.426978492736815,
+                "residual": -3.756153941214535e-7
+              },
+              {
+                "iteration": 23,
+                "low": 62.42696762084961,
+                "high": 62.426978492736815,
+                "mid": 62.426973056793216,
+                "residual": -1.6983485240373852e-7
+              },
+              {
+                "iteration": 24,
+                "low": 62.42696762084961,
+                "high": 62.426973056793216,
+                "mid": 62.42697033882141,
+                "residual": -6.694456100575508e-8
+              },
+              {
+                "iteration": 25,
+                "low": 62.42696762084961,
+                "high": 62.42697033882141,
+                "mid": 62.42696897983551,
+                "residual": -1.549941108791586e-8
+              },
+              {
+                "iteration": 26,
+                "low": 62.42696762084961,
+                "high": 62.42696897983551,
+                "mid": 62.42696830034256,
+                "residual": 1.0223164759182168e-8
+              },
+              {
+                "iteration": 27,
+                "low": 62.42696830034256,
+                "high": 62.42696897983551,
+                "mid": 62.42696864008903,
+                "residual": -2.6381226092553334e-9
+              },
+              {
+                "iteration": 28,
+                "low": 62.42696830034256,
+                "high": 62.42696864008903,
+                "mid": 62.4269684702158,
+                "residual": 3.79252074189651e-9
+              },
+              {
+                "iteration": 29,
+                "low": 62.4269684702158,
+                "high": 62.42696864008903,
+                "mid": 62.42696855515241,
+                "residual": 5.771991773428908e-10
+              },
+              {
+                "iteration": 30,
+                "low": 62.42696855515241,
+                "high": 62.42696864008903,
+                "mid": 62.42696859762072,
+                "residual": -1.0304637143576656e-9
+              },
+              {
+                "iteration": 31,
+                "low": 62.42696855515241,
+                "high": 62.42696859762072,
+                "mid": 62.42696857638657,
+                "residual": -2.2663182441817753e-10
+              },
+              {
+                "iteration": 32,
+                "low": 62.42696855515241,
+                "high": 62.42696857638657,
+                "mid": 62.42696856576949,
+                "residual": 1.7528400952926404e-10
+              },
+              {
+                "iteration": 33,
+                "low": 62.42696856576949,
+                "high": 62.42696857638657,
+                "mid": 62.426968571078035,
+                "residual": -2.567546175669122e-11
+              }
+            ],
+            "fitIndices": [
+              0,
+              0
+            ]
+          }
+        },
+        "flashAtState": {
+          "phase": "two-phase",
+          "K": [
+            1.7396294348824313,
+            0.61751667528604
+          ],
+          "beta": 0.6312323335459951,
+          "x": [
+            0.34085997279950436,
+            0.6591400272004602
+          ],
+          "y": [
+            0.5929700418552427,
+            0.40702995814477816
+          ],
+          "vaporMoles": 63.123233354599506,
+          "liquidMoles": 36.876766645400494,
+          "componentLiquidMoles": [
+            12.569813675684882,
+            24.306952969714303
+          ],
+          "componentVaporMoles": [
+            37.43018632431512,
+            25.6930470302857
+          ],
+          "sumX": 0.9999999999999645,
+          "sumY": 1.0000000000000209,
+          "balanceError": 5.551115123125783e-17,
+          "trace": [
+            {
+              "iteration": 1,
+              "low": 0,
+              "high": 1,
+              "mid": 0.5,
+              "residual": 0.03351096580626742
+            },
+            {
+              "iteration": 2,
+              "low": 0.5,
+              "high": 1,
+              "mid": 0.75,
+              "residual": -0.03030392428214629
+            },
+            {
+              "iteration": 3,
+              "low": 0.5,
+              "high": 0.75,
+              "mid": 0.625,
+              "residual": 0.0015845113372461306
+            },
+            {
+              "iteration": 4,
+              "low": 0.625,
+              "high": 0.75,
+              "mid": 0.6875,
+              "residual": -0.014316900144047934
+            },
+            {
+              "iteration": 5,
+              "low": 0.625,
+              "high": 0.6875,
+              "mid": 0.65625,
+              "residual": -0.006361452430634046
+            },
+            {
+              "iteration": 6,
+              "low": 0.625,
+              "high": 0.65625,
+              "mid": 0.640625,
+              "residual": -0.0023880258044753355
+            },
+            {
+              "iteration": 7,
+              "low": 0.625,
+              "high": 0.640625,
+              "mid": 0.6328125,
+              "residual": -0.00040173853122704717
+            },
+            {
+              "iteration": 8,
+              "low": 0.625,
+              "high": 0.6328125,
+              "mid": 0.62890625,
+              "residual": 0.0005913795204150474
+            },
+            {
+              "iteration": 9,
+              "low": 0.62890625,
+              "high": 0.6328125,
+              "mid": 0.630859375,
+              "residual": 0.00009482021871193291
+            },
+            {
+              "iteration": 10,
+              "low": 0.630859375,
+              "high": 0.6328125,
+              "mid": 0.6318359375,
+              "residual": -0.0001534590446343742
+            },
+            {
+              "iteration": 11,
+              "low": 0.630859375,
+              "high": 0.6318359375,
+              "mid": 0.63134765625,
+              "residual": -0.00002931940762956886
+            },
+            {
+              "iteration": 12,
+              "low": 0.630859375,
+              "high": 0.63134765625,
+              "mid": 0.631103515625,
+              "residual": 0.00003275040405226193
+            },
+            {
+              "iteration": 13,
+              "low": 0.631103515625,
+              "high": 0.63134765625,
+              "mid": 0.6312255859375,
+              "residual": 0.0000017154981918343637
+            },
+            {
+              "iteration": 14,
+              "low": 0.6312255859375,
+              "high": 0.63134765625,
+              "mid": 0.63128662109375,
+              "residual": -0.000013801954679704131
+            },
+            {
+              "iteration": 15,
+              "low": 0.6312255859375,
+              "high": 0.63128662109375,
+              "mid": 0.631256103515625,
+              "residual": -0.000006043228239605014
+            },
+            {
+              "iteration": 16,
+              "low": 0.6312255859375,
+              "high": 0.631256103515625,
+              "mid": 0.6312408447265625,
+              "residual": -0.000002163865023496747
+            },
+            {
+              "iteration": 17,
+              "low": 0.6312255859375,
+              "high": 0.6312408447265625,
+              "mid": 0.6312332153320312,
+              "residual": -2.2418341577568057e-7
+            },
+            {
+              "iteration": 18,
+              "low": 0.6312255859375,
+              "high": 0.6312332153320312,
+              "mid": 0.6312294006347656,
+              "residual": 7.456573880570971e-7
+            },
+            {
+              "iteration": 19,
+              "low": 0.6312294006347656,
+              "high": 0.6312332153320312,
+              "mid": 0.6312313079833984,
+              "residual": 2.607369861129527e-7
+            },
+            {
+              "iteration": 20,
+              "low": 0.6312313079833984,
+              "high": 0.6312332153320312,
+              "mid": 0.6312322616577148,
+              "residual": 1.827678514088049e-8
+            },
+            {
+              "iteration": 21,
+              "low": 0.6312322616577148,
+              "high": 0.6312332153320312,
+              "mid": 0.631232738494873,
+              "residual": -1.0295331531740004e-7
+            },
+            {
+              "iteration": 22,
+              "low": 0.6312322616577148,
+              "high": 0.631232738494873,
+              "mid": 0.631232500076294,
+              "residual": -4.233826511601535e-8
+            },
+            {
+              "iteration": 23,
+              "low": 0.6312322616577148,
+              "high": 0.631232500076294,
+              "mid": 0.6312323808670044,
+              "residual": -1.2030739959811854e-8
+            },
+            {
+              "iteration": 24,
+              "low": 0.6312322616577148,
+              "high": 0.6312323808670044,
+              "mid": 0.6312323212623596,
+              "residual": 3.1230225627787433e-9
+            },
+            {
+              "iteration": 25,
+              "low": 0.6312323212623596,
+              "high": 0.6312323808670044,
+              "mid": 0.631232351064682,
+              "residual": -4.453858726272131e-9
+            },
+            {
+              "iteration": 26,
+              "low": 0.6312323212623596,
+              "high": 0.631232351064682,
+              "mid": 0.6312323361635208,
+              "residual": -6.654180539911181e-10
+            },
+            {
+              "iteration": 27,
+              "low": 0.6312323212623596,
+              "high": 0.6312323361635208,
+              "mid": 0.6312323287129402,
+              "residual": 1.2288022821493882e-9
+            },
+            {
+              "iteration": 28,
+              "low": 0.6312323287129402,
+              "high": 0.6312323361635208,
+              "mid": 0.6312323324382305,
+              "residual": 2.816921140791351e-10
+            },
+            {
+              "iteration": 29,
+              "low": 0.6312323324382305,
+              "high": 0.6312323361635208,
+              "mid": 0.6312323343008757,
+              "residual": -1.918629699559915e-10
+            },
+            {
+              "iteration": 30,
+              "low": 0.6312323324382305,
+              "high": 0.6312323343008757,
+              "mid": 0.6312323333695531,
+              "residual": 4.491462757272302e-11
+            },
+            {
+              "iteration": 31,
+              "low": 0.6312323333695531,
+              "high": 0.6312323343008757,
+              "mid": 0.6312323338352144,
+              "residual": -7.347422670278547e-11
+            },
+            {
+              "iteration": 32,
+              "low": 0.6312323333695531,
+              "high": 0.6312323338352144,
+              "mid": 0.6312323336023837,
+              "residual": -1.4279799565031226e-11
+            },
+            {
+              "iteration": 33,
+              "low": 0.6312323333695531,
+              "high": 0.6312323336023837,
+              "mid": 0.6312323334859684,
+              "residual": 1.5317358492694666e-11
+            },
+            {
+              "iteration": 34,
+              "low": 0.6312323334859684,
+              "high": 0.6312323336023837,
+              "mid": 0.6312323335441761,
+              "residual": 5.187517082561044e-13
+            },
+            {
+              "iteration": 35,
+              "low": 0.6312323335441761,
+              "high": 0.6312323336023837,
+              "mid": 0.6312323335732799,
+              "residual": -6.880551683963176e-12
+            },
+            {
+              "iteration": 36,
+              "low": 0.6312323335441761,
+              "high": 0.6312323335732799,
+              "mid": 0.631232333558728,
+              "residual": -3.180899987853536e-12
+            },
+            {
+              "iteration": 37,
+              "low": 0.6312323335441761,
+              "high": 0.631232333558728,
+              "mid": 0.631232333551452,
+              "residual": -1.3310463842231002e-12
+            },
+            {
+              "iteration": 38,
+              "low": 0.6312323335441761,
+              "high": 0.631232333551452,
+              "mid": 0.631232333547814,
+              "residual": -4.0611958240788226e-13
+            },
+            {
+              "iteration": 39,
+              "low": 0.6312323335441761,
+              "high": 0.631232333547814,
+              "mid": 0.6312323335459951,
+              "residual": 5.6288307348495437e-14
+            }
+          ]
+        },
+        "PxyTable": [
+          {
+            "x": 0,
+            "y": 0,
+            "P_kPa": 18.5255002585812,
+            "T_C": 60
+          },
+          {
+            "x": 0.2,
+            "y": 0.4132434690462995,
+            "P_kPa": 25.258176816159548,
+            "T_C": 60
+          },
+          {
+            "x": 0.4,
+            "y": 0.6525475571003819,
+            "P_kPa": 31.990853373737895,
+            "T_C": 60
+          },
+          {
+            "x": 0.6,
+            "y": 0.8086383106969866,
+            "P_kPa": 38.72352993131624,
+            "T_C": 60
+          },
+          {
+            "x": 0.8,
+            "y": 0.9184907774338488,
+            "P_kPa": 45.45620648889459,
+            "T_C": 60
+          },
+          {
+            "x": 1,
+            "y": 1,
+            "P_kPa": 52.18888304647294,
+            "T_C": 60
+          }
+        ],
+        "TxyTable": [
+          {
+            "x": 0,
+            "y": 0,
+            "P_kPa": 30,
+            "T_C": 72.71303404532372
+          },
+          {
+            "x": 0.2,
+            "y": 0.4085553828282144,
+            "P_kPa": 30,
+            "T_C": 64.61580719379708
+          },
+          {
+            "x": 0.4,
+            "y": 0.6542318238617497,
+            "P_kPa": 30,
+            "T_C": 58.26736424705014
+          },
+          {
+            "x": 0.6,
+            "y": 0.8132523310294739,
+            "P_kPa": 30,
+            "T_C": 53.1188591727987
+          },
+          {
+            "x": 0.8,
+            "y": 0.9221309711434216,
+            "P_kPa": 30,
+            "T_C": 48.82934172097593
+          },
+          {
+            "x": 1,
+            "y": 1.0000000000463727,
+            "P_kPa": 30,
+            "T_C": 45.177638598158964
+          }
+        ]
+      },
+      "verification": {
+        "allRequestedTemperaturesSupported": true,
+        "extrapolationsUsed": 0,
+        "phaseAtBothComputedBoundariesCorrect": true,
+        "fullBinaryPxyGapCount": 0,
+        "fullBinaryTxyGapCount": 0
+      }
+    },
+    {
+      "id": "alkanes",
+      "title": "Three hydrocarbons within a shared property-data range",
+      "componentIds": [
+        "b4-n-hexane",
+        "b4-n-heptane",
+        "b4-n-octane"
+      ],
+      "components": [
+        {
+          "id": "b4-n-hexane",
+          "name": "n-Hexane",
+          "z": 0.4,
+          "fit": {
+            "A": 6.88555,
+            "B": 1175.817,
+            "C": 224.867,
+            "tUnit": "C",
+            "pUnit": "mmHg",
+            "logBase": "10",
+            "minC": 13,
+            "maxC": 69.5,
+            "source": "Table B.4, user-provided image"
+          }
+        },
+        {
+          "id": "b4-n-heptane",
+          "name": "n-Heptane",
+          "z": 0.35,
+          "fit": {
+            "A": 6.90253,
+            "B": 1267.828,
+            "C": 216.823,
+            "tUnit": "C",
+            "pUnit": "mmHg",
+            "logBase": "10",
+            "minC": 25.9,
+            "maxC": 99.3,
+            "source": "Table B.4, user-provided image"
+          }
+        },
+        {
+          "id": "b4-n-octane",
+          "name": "n-Octane",
+          "z": 0.25,
+          "fit": {
+            "A": 6.91874,
+            "B": 1351.756,
+            "C": 209.1,
+            "tUnit": "C",
+            "pUnit": "mmHg",
+            "logBase": "10",
+            "minC": 52.9,
+            "maxC": 126.6,
+            "source": "Table B.4, user-provided image"
+          }
+        }
+      ],
+      "state": {
+        "T_C": 60,
+        "P_kPa": 34,
+        "totalMoles": 100
+      },
+      "z": [
+        0.4,
+        0.35,
+        0.25
+      ],
+      "commonValidIntervalsC": [
+        [
+          52.9,
+          69.5
+        ]
+      ],
+      "preset": {
+        "T": 60,
+        "P": 34,
+        "totalMoles": 100,
+        "mode": "pt",
+        "calculation": "bt",
+        "binaryZ": 0.4,
+        "extrapolate": false
+      },
+      "questions": [
+        {
+          "part": "a",
+          "prompt": "At 60°C, use x=(0.40,0.35,0.25) to calculate the bubble pressure and first vapor composition of n-hexane/n-heptane/n-octane."
+        },
+        {
+          "part": "b",
+          "prompt": "For a separate vapor with y=(0.40,0.35,0.25) at 60°C, calculate the dew pressure and first liquid composition."
+        },
+        {
+          "part": "c",
+          "prompt": "For overall composition z=(0.40,0.35,0.25), calculate both boundary temperatures at 34.00 kPa. Verify that both lie in the shared interval 52.9–69.5°C."
+        },
+        {
+          "part": "d",
+          "prompt": "Classify a 100.0 mol sample at 60°C and 34.00 kPa. Extension: find its liquid and vapor amounts and compositions."
+        }
+      ],
+      "answers": {
+        "pressureAtT": {
+          "psatKPa": [
+            76.35774998064075,
+            28.022708495628986,
+            10.480817454210335
+          ],
+          "bubbleTermsKPa": [
+            30.543099992256302,
+            9.807947973470144,
+            2.620204363552584
+          ],
+          "bubblePressureKPa": 42.971252329279025,
+          "bubbleVaporY": [
+            0.7107798431893818,
+            0.22824440624429673,
+            0.060975750566321596
+          ],
+          "dewTermsPerKPa": [
+            0.005238499040390968,
+            0.012489870493945772,
+            0.023853101257819392
+          ],
+          "dewPressureKPa": 24.049173368553348,
+          "dewLiquidX": [
+            0.12598157161336274,
+            0.3003710608596809,
+            0.5736473675269566
+          ]
+        },
+        "temperatureAtP": {
+          "bubble": {
+            "temperatureC": 53.4652750873007,
+            "psatKPa": [
+              61.0864296779133,
+              21.716103412090025,
+              7.8591677277109
+            ],
+            "partialPressuresKPa": [
+              24.43457187116532,
+              7.600636194231508,
+              1.964791931927725
+            ],
+            "incipientComposition": [
+              0.718663878563686,
+              0.22354812335975024,
+              0.05778799799787426
+            ],
+            "residual": -2.6754420900942932e-9,
+            "residualUnit": "kPa",
+            "trace": [
+              {
+                "iteration": 1,
+                "low": 52.9,
+                "high": 69.5,
+                "mid": 61.2,
+                "residual": 10.808356113835828
+              },
+              {
+                "iteration": 2,
+                "low": 52.9,
+                "high": 61.2,
+                "mid": 57.05,
+                "residual": 4.711408122963952
+              },
+              {
+                "iteration": 3,
+                "low": 52.9,
+                "high": 57.05,
+                "mid": 54.974999999999994,
+                "residual": 1.924231081502235
+              },
+              {
+                "iteration": 4,
+                "low": 52.9,
+                "high": 54.974999999999994,
+                "mid": 53.9375,
+                "residual": 0.5927013650679598
+              },
+              {
+                "iteration": 5,
+                "low": 52.9,
+                "high": 53.9375,
+                "mid": 53.41875,
+                "residual": -0.05794782460964143
+              },
+              {
+                "iteration": 6,
+                "low": 53.41875,
+                "high": 53.9375,
+                "mid": 53.678125,
+                "residual": 0.2661288883873709
+              },
+              {
+                "iteration": 7,
+                "low": 53.41875,
+                "high": 53.678125,
+                "mid": 53.548437500000006,
+                "residual": 0.10377943943916534
+              },
+              {
+                "iteration": 8,
+                "low": 53.41875,
+                "high": 53.548437500000006,
+                "mid": 53.483593750000004,
+                "residual": 0.02283814390314376
+              },
+              {
+                "iteration": 9,
+                "low": 53.41875,
+                "high": 53.483593750000004,
+                "mid": 53.451171875,
+                "residual": -0.01757424254050477
+              },
+              {
+                "iteration": 10,
+                "low": 53.451171875,
+                "high": 53.483593750000004,
+                "mid": 53.467382812500006,
+                "residual": 0.002627098423630514
+              },
+              {
+                "iteration": 11,
+                "low": 53.451171875,
+                "high": 53.467382812500006,
+                "mid": 53.45927734375,
+                "residual": -0.007474784908936272
+              },
+              {
+                "iteration": 12,
+                "low": 53.45927734375,
+                "high": 53.467382812500006,
+                "mid": 53.463330078125004,
+                "residual": -0.002424146482056244
+              },
+              {
+                "iteration": 13,
+                "low": 53.463330078125004,
+                "high": 53.467382812500006,
+                "mid": 53.46535644531251,
+                "residual": 0.00010140015762516441
+              },
+              {
+                "iteration": 14,
+                "low": 53.463330078125004,
+                "high": 53.46535644531251,
+                "mid": 53.46434326171875,
+                "residual": -0.0011613921150512851
+              },
+              {
+                "iteration": 15,
+                "low": 53.46434326171875,
+                "high": 53.46535644531251,
+                "mid": 53.46484985351563,
+                "residual": -0.0005300007170205845
+              },
+              {
+                "iteration": 16,
+                "low": 53.46484985351563,
+                "high": 53.46535644531251,
+                "mid": 53.46510314941407,
+                "residual": -0.0002143014642115304
+              },
+              {
+                "iteration": 17,
+                "low": 53.46510314941407,
+                "high": 53.46535644531251,
+                "mid": 53.46522979736329,
+                "residual": -0.000056450949443842546
+              },
+              {
+                "iteration": 18,
+                "low": 53.46522979736329,
+                "high": 53.46535644531251,
+                "mid": 53.4652931213379,
+                "residual": 0.000022474530062766007
+              },
+              {
+                "iteration": 19,
+                "low": 53.46522979736329,
+                "high": 53.4652931213379,
+                "mid": 53.4652614593506,
+                "residual": -0.000016988228196623822
+              },
+              {
+                "iteration": 20,
+                "low": 53.4652614593506,
+                "high": 53.4652931213379,
+                "mid": 53.46527729034425,
+                "residual": 0.000002743146282568887
+              },
+              {
+                "iteration": 21,
+                "low": 53.4652614593506,
+                "high": 53.46527729034425,
+                "mid": 53.46526937484742,
+                "residual": -0.000007122542072579563
+              },
+              {
+                "iteration": 22,
+                "low": 53.46526937484742,
+                "high": 53.46527729034425,
+                "mid": 53.465273332595835,
+                "residual": -0.0000021896981863278597
+              },
+              {
+                "iteration": 23,
+                "low": 53.465273332595835,
+                "high": 53.46527729034425,
+                "mid": 53.46527531147004,
+                "residual": 2.7672399482980836e-7
+              },
+              {
+                "iteration": 24,
+                "low": 53.465273332595835,
+                "high": 53.46527531147004,
+                "mid": 53.46527432203294,
+                "residual": -9.564870850908846e-7
+              },
+              {
+                "iteration": 25,
+                "low": 53.46527432203294,
+                "high": 53.46527531147004,
+                "mid": 53.46527481675149,
+                "residual": -3.3988160907938436e-7
+              },
+              {
+                "iteration": 26,
+                "low": 53.46527481675149,
+                "high": 53.46527531147004,
+                "mid": 53.46527506411076,
+                "residual": -3.157877159765121e-8
+              },
+              {
+                "iteration": 27,
+                "low": 53.46527506411076,
+                "high": 53.46527531147004,
+                "mid": 53.4652751877904,
+                "residual": 1.2257257964165547e-7
+              },
+              {
+                "iteration": 28,
+                "low": 53.46527506411076,
+                "high": 53.4652751877904,
+                "mid": 53.46527512595058,
+                "residual": 4.5496847178583266e-8
+              },
+              {
+                "iteration": 29,
+                "low": 53.46527506411076,
+                "high": 53.46527512595058,
+                "mid": 53.46527509503068,
+                "residual": 6.9590697648891364e-9
+              },
+              {
+                "iteration": 30,
+                "low": 53.46527506411076,
+                "high": 53.46527509503068,
+                "mid": 53.465275079570716,
+                "residual": -1.2309889996231504e-8
+              },
+              {
+                "iteration": 31,
+                "low": 53.465275079570716,
+                "high": 53.46527509503068,
+                "mid": 53.4652750873007,
+                "residual": -2.6754420900942932e-9
+              }
+            ],
+            "fitIndices": [
+              0,
+              0,
+              0
+            ]
+          },
+          "dew": {
+            "temperatureC": 68.88221820271573,
+            "psatKPa": [
+              101.77968216986307,
+              38.89503701356124,
+              15.167022407609345
+            ],
+            "partialPressuresKPa": [
+              13.600000000000001,
+              11.899999999999999,
+              8.5
+            ],
+            "incipientComposition": [
+              0.1336219539112194,
+              0.30595163068879233,
+              0.5604264153876058
+            ],
+            "residual": -1.2382428415946833e-11,
+            "residualUnit": "dimensionless",
+            "trace": [
+              {
+                "iteration": 1,
+                "low": 52.9,
+                "high": 69.5,
+                "mid": 61.2,
+                "residual": 0.3473195195150751
+              },
+              {
+                "iteration": 2,
+                "low": 61.2,
+                "high": 69.5,
+                "mid": 65.35,
+                "residual": 0.14447777090554093
+              },
+              {
+                "iteration": 3,
+                "low": 65.35,
+                "high": 69.5,
+                "mid": 67.425,
+                "residual": 0.05679972676164624
+              },
+              {
+                "iteration": 4,
+                "low": 67.425,
+                "high": 69.5,
+                "mid": 68.4625,
+                "residual": 0.015977510161317987
+              },
+              {
+                "iteration": 5,
+                "low": 68.4625,
+                "high": 69.5,
+                "mid": 68.98125,
+                "residual": -0.003725964804174975
+              },
+              {
+                "iteration": 6,
+                "low": 68.4625,
+                "high": 68.98125,
+                "mid": 68.72187500000001,
+                "residual": 0.006068121597905485
+              },
+              {
+                "iteration": 7,
+                "low": 68.72187500000001,
+                "high": 68.98125,
+                "mid": 68.8515625,
+                "residual": 0.0011567624554869038
+              },
+              {
+                "iteration": 8,
+                "low": 68.8515625,
+                "high": 68.98125,
+                "mid": 68.91640625,
+                "residual": -0.0012881681360031871
+              },
+              {
+                "iteration": 9,
+                "low": 68.8515625,
+                "high": 68.91640625,
+                "mid": 68.883984375,
+                "residual": -0.00006659608008496853
+              },
+              {
+                "iteration": 10,
+                "low": 68.8515625,
+                "high": 68.883984375,
+                "mid": 68.8677734375,
+                "residual": 0.0005448596900070601
+              },
+              {
+                "iteration": 11,
+                "low": 68.8677734375,
+                "high": 68.883984375,
+                "mid": 68.87587890625,
+                "residual": 0.00023907595401895243
+              },
+              {
+                "iteration": 12,
+                "low": 68.87587890625,
+                "high": 68.883984375,
+                "mid": 68.87993164062499,
+                "residual": 0.00008622597716545499
+              },
+              {
+                "iteration": 13,
+                "low": 68.87993164062499,
+                "high": 68.883984375,
+                "mid": 68.8819580078125,
+                "residual": 0.000009811458955955032
+              },
+              {
+                "iteration": 14,
+                "low": 68.8819580078125,
+                "high": 68.883984375,
+                "mid": 68.88297119140626,
+                "residual": -0.000028393182915142923
+              },
+              {
+                "iteration": 15,
+                "low": 68.8819580078125,
+                "high": 68.88297119140626,
+                "mid": 68.88246459960938,
+                "residual": -0.000009291080073081659
+              },
+              {
+                "iteration": 16,
+                "low": 68.8819580078125,
+                "high": 68.88246459960938,
+                "mid": 68.88221130371093,
+                "residual": 2.601349180508805e-7
+              },
+              {
+                "iteration": 17,
+                "low": 68.88221130371093,
+                "high": 68.88246459960938,
+                "mid": 68.88233795166016,
+                "residual": -0.00000451548620905573
+              },
+              {
+                "iteration": 18,
+                "low": 68.88221130371093,
+                "high": 68.88233795166016,
+                "mid": 68.88227462768555,
+                "residual": -0.0000021276790536095547
+              },
+              {
+                "iteration": 19,
+                "low": 68.88221130371093,
+                "high": 68.88227462768555,
+                "mid": 68.88224296569824,
+                "residual": -9.337729187652855e-7
+              },
+              {
+                "iteration": 20,
+                "low": 68.88221130371093,
+                "high": 68.88224296569824,
+                "mid": 68.88222713470458,
+                "residual": -3.368192127428671e-7
+              },
+              {
+                "iteration": 21,
+                "low": 68.88221130371093,
+                "high": 68.88222713470458,
+                "mid": 68.88221921920776,
+                "residual": -3.834220096976537e-8
+              },
+              {
+                "iteration": 22,
+                "low": 68.88221130371093,
+                "high": 68.88221921920776,
+                "mid": 68.88221526145935,
+                "residual": 1.1089634432970286e-7
+              },
+              {
+                "iteration": 23,
+                "low": 68.88221526145935,
+                "high": 68.88221921920776,
+                "mid": 68.88221724033355,
+                "residual": 3.627706801623276e-8
+              },
+              {
+                "iteration": 24,
+                "low": 68.88221724033355,
+                "high": 68.88221921920776,
+                "mid": 68.88221822977064,
+                "residual": -1.032566809833213e-9
+              },
+              {
+                "iteration": 25,
+                "low": 68.88221724033355,
+                "high": 68.88221822977064,
+                "mid": 68.8822177350521,
+                "residual": 1.7622250991777832e-8
+              },
+              {
+                "iteration": 26,
+                "low": 68.8822177350521,
+                "high": 68.88221822977064,
+                "mid": 68.88221798241136,
+                "residual": 8.294842368528066e-9
+              },
+              {
+                "iteration": 27,
+                "low": 68.88221798241136,
+                "high": 68.88221822977064,
+                "mid": 68.882218106091,
+                "residual": 3.631136724635553e-9
+              },
+              {
+                "iteration": 28,
+                "low": 68.882218106091,
+                "high": 68.88221822977064,
+                "mid": 68.88221816793083,
+                "residual": 1.2992846798454138e-9
+              },
+              {
+                "iteration": 29,
+                "low": 68.88221816793083,
+                "high": 68.88221822977064,
+                "mid": 68.88221819885074,
+                "residual": 1.3335954562876395e-10
+              },
+              {
+                "iteration": 30,
+                "low": 68.88221819885074,
+                "high": 68.88221822977064,
+                "mid": 68.88221821431068,
+                "residual": -4.4960368761337577e-10
+              },
+              {
+                "iteration": 31,
+                "low": 68.88221819885074,
+                "high": 68.88221821431068,
+                "mid": 68.88221820658072,
+                "residual": -1.5812262610381822e-10
+              },
+              {
+                "iteration": 32,
+                "low": 68.88221819885074,
+                "high": 68.88221820658072,
+                "mid": 68.88221820271573,
+                "residual": -1.2382428415946833e-11
+              }
+            ],
+            "fitIndices": [
+              0,
+              0,
+              0
+            ]
+          }
+        },
+        "flashAtState": {
+          "phase": "two-phase",
+          "K": [
+            2.2458161759011985,
+            0.8241973086949702,
+            0.3082593368885393
+          ],
+          "beta": 0.4526905769703262,
+          "x": [
+            0.2557595052912346,
+            0.380262929291793,
+            0.36397756541694254
+          ],
+          "y": [
+            0.5743888341235428,
+            0.31341168291876154,
+            0.11219948295773163
+          ],
+          "vaporMoles": 45.26905769703262,
+          "liquidMoles": 54.73094230296738,
+          "componentLiquidMoles": [
+            13.99795872753004,
+            20.812148443026487,
+            19.920835132409216
+          ],
+          "componentVaporMoles": [
+            26.00204127246996,
+            14.18785155697351,
+            5.079164867590782
+          ],
+          "sumX": 0.9999999999999702,
+          "sumY": 1.000000000000036,
+          "balanceError": 6.938893903907228e-18,
+          "trace": [
+            {
+              "iteration": 1,
+              "low": 0,
+              "high": 1,
+              "mid": 0.5,
+              "residual": -0.02477755407371285
+            },
+            {
+              "iteration": 2,
+              "low": 0,
+              "high": 0.5,
+              "mid": 0.25,
+              "residual": 0.10652548135703757
+            },
+            {
+              "iteration": 3,
+              "low": 0.25,
+              "high": 0.5,
+              "mid": 0.375,
+              "residual": 0.040267482875737864
+            },
+            {
+              "iteration": 4,
+              "low": 0.375,
+              "high": 0.5,
+              "mid": 0.4375,
+              "residual": 0.007889991186872197
+            },
+            {
+              "iteration": 5,
+              "low": 0.4375,
+              "high": 0.5,
+              "mid": 0.46875,
+              "residual": -0.008369387970196818
+            },
+            {
+              "iteration": 6,
+              "low": 0.4375,
+              "high": 0.46875,
+              "mid": 0.453125,
+              "residual": -0.00022597535080320919
+            },
+            {
+              "iteration": 7,
+              "low": 0.4375,
+              "high": 0.453125,
+              "mid": 0.4453125,
+              "residual": 0.003834840702112985
+            },
+            {
+              "iteration": 8,
+              "low": 0.4453125,
+              "high": 0.453125,
+              "mid": 0.44921875,
+              "residual": 0.0018052151737186217
+            },
+            {
+              "iteration": 9,
+              "low": 0.44921875,
+              "high": 0.453125,
+              "mid": 0.451171875,
+              "residual": 0.0007898248607241531
+            },
+            {
+              "iteration": 10,
+              "low": 0.451171875,
+              "high": 0.453125,
+              "mid": 0.4521484375,
+              "residual": 0.000281977160283331
+            },
+            {
+              "iteration": 11,
+              "low": 0.4521484375,
+              "high": 0.453125,
+              "mid": 0.45263671875,
+              "residual": 0.000028014152225475097
+            },
+            {
+              "iteration": 12,
+              "low": 0.45263671875,
+              "high": 0.453125,
+              "mid": 0.452880859375,
+              "residual": -0.00009897726913843385
+            },
+            {
+              "iteration": 13,
+              "low": 0.45263671875,
+              "high": 0.452880859375,
+              "mid": 0.4527587890625,
+              "residual": -0.00003548072820419579
+            },
+            {
+              "iteration": 14,
+              "low": 0.45263671875,
+              "high": 0.4527587890625,
+              "mid": 0.45269775390625,
+              "residual": -0.000003733080711887382
+            },
+            {
+              "iteration": 15,
+              "low": 0.45263671875,
+              "high": 0.45269775390625,
+              "mid": 0.452667236328125,
+              "residual": 0.00001214058754045455
+            },
+            {
+              "iteration": 16,
+              "low": 0.452667236328125,
+              "high": 0.45269775390625,
+              "mid": 0.4526824951171875,
+              "residual": 0.000004203766364618833
+            },
+            {
+              "iteration": 17,
+              "low": 0.4526824951171875,
+              "high": 0.45269775390625,
+              "mid": 0.45269012451171875,
+              "residual": 2.353460645254657e-7
+            },
+            {
+              "iteration": 18,
+              "low": 0.45269012451171875,
+              "high": 0.45269775390625,
+              "mid": 0.4526939392089844,
+              "residual": -0.0000017488665140508175
+            },
+            {
+              "iteration": 19,
+              "low": 0.45269012451171875,
+              "high": 0.4526939392089844,
+              "mid": 0.45269203186035156,
+              "residual": -7.567600224245297e-7
+            },
+            {
+              "iteration": 20,
+              "low": 0.45269012451171875,
+              "high": 0.45269203186035156,
+              "mid": 0.45269107818603516,
+              "residual": -2.607069282678509e-7
+            },
+            {
+              "iteration": 21,
+              "low": 0.45269012451171875,
+              "high": 0.45269107818603516,
+              "mid": 0.45269060134887695,
+              "residual": -1.268041927016128e-8
+            },
+            {
+              "iteration": 22,
+              "low": 0.45269012451171875,
+              "high": 0.45269060134887695,
+              "mid": 0.45269036293029785,
+              "residual": 1.1133282579178783e-7
+            },
+            {
+              "iteration": 23,
+              "low": 0.45269036293029785,
+              "high": 0.45269060134887695,
+              "mid": 0.4526904821395874,
+              "residual": 4.9326204065724966e-8
+            },
+            {
+              "iteration": 24,
+              "low": 0.4526904821395874,
+              "high": 0.45269060134887695,
+              "mid": 0.4526905417442322,
+              "residual": 1.8322892592070872e-8
+            },
+            {
+              "iteration": 25,
+              "low": 0.4526905417442322,
+              "high": 0.45269060134887695,
+              "mid": 0.45269057154655457,
+              "residual": 2.8212366887103713e-9
+            },
+            {
+              "iteration": 26,
+              "low": 0.45269057154655457,
+              "high": 0.45269060134887695,
+              "mid": 0.45269058644771576,
+              "residual": -4.9295912352143034e-9
+            },
+            {
+              "iteration": 27,
+              "low": 0.45269057154655457,
+              "high": 0.45269058644771576,
+              "mid": 0.45269057899713516,
+              "residual": -1.0541772454963905e-9
+            },
+            {
+              "iteration": 28,
+              "low": 0.45269057154655457,
+              "high": 0.45269057899713516,
+              "mid": 0.45269057527184486,
+              "residual": 8.83529749362566e-10
+            },
+            {
+              "iteration": 29,
+              "low": 0.45269057527184486,
+              "high": 0.45269057899713516,
+              "mid": 0.45269057713449,
+              "residual": -8.5323692555761e-11
+            },
+            {
+              "iteration": 30,
+              "low": 0.45269057527184486,
+              "high": 0.45269057713449,
+              "mid": 0.45269057620316744,
+              "residual": 3.9910291738110004e-10
+            },
+            {
+              "iteration": 31,
+              "low": 0.45269057620316744,
+              "high": 0.45269057713449,
+              "mid": 0.4526905766688287,
+              "residual": 1.5688966792382075e-10
+            },
+            {
+              "iteration": 32,
+              "low": 0.4526905766688287,
+              "high": 0.45269057713449,
+              "mid": 0.45269057690165937,
+              "residual": 3.5782876661727414e-11
+            },
+            {
+              "iteration": 33,
+              "low": 0.45269057690165937,
+              "high": 0.45269057713449,
+              "mid": 0.4526905770180747,
+              "residual": -2.4770407947016793e-11
+            },
+            {
+              "iteration": 34,
+              "low": 0.45269057690165937,
+              "high": 0.4526905770180747,
+              "mid": 0.45269057695986703,
+              "residual": 5.506262112930926e-12
+            },
+            {
+              "iteration": 35,
+              "low": 0.45269057695986703,
+              "high": 0.4526905770180747,
+              "mid": 0.45269057698897086,
+              "residual": -9.632017405891702e-12
+            },
+            {
+              "iteration": 36,
+              "low": 0.45269057695986703,
+              "high": 0.45269057698897086,
+              "mid": 0.45269057697441895,
+              "residual": -2.062849890904772e-12
+            },
+            {
+              "iteration": 37,
+              "low": 0.45269057695986703,
+              "high": 0.45269057697441895,
+              "mid": 0.452690576967143,
+              "residual": 1.7216228442862302e-12
+            },
+            {
+              "iteration": 38,
+              "low": 0.452690576967143,
+              "high": 0.45269057697441895,
+              "mid": 0.45269057697078097,
+              "residual": -1.7064127888488656e-13
+            },
+            {
+              "iteration": 39,
+              "low": 0.452690576967143,
+              "high": 0.45269057697078097,
+              "mid": 0.452690576968962,
+              "residual": 7.754907827006718e-13
+            },
+            {
+              "iteration": 40,
+              "low": 0.452690576968962,
+              "high": 0.45269057697078097,
+              "mid": 0.45269057696987147,
+              "residual": 3.024802630591239e-13
+            },
+            {
+              "iteration": 41,
+              "low": 0.45269057696987147,
+              "high": 0.45269057697078097,
+              "mid": 0.4526905769703262,
+              "residual": 6.583622536027178e-14
+            }
+          ]
+        }
+      },
+      "verification": {
+        "allRequestedTemperaturesSupported": true,
+        "extrapolationsUsed": 0,
+        "phaseAtBothComputedBoundariesCorrect": true
+      }
+    },
+    {
+      "id": "alcohols",
+      "title": "Methanol + ethanol: an ideal-model calculation",
+      "componentIds": [
+        "b4-methanol",
+        "b4-ethanol"
+      ],
+      "components": [
+        {
+          "id": "b4-methanol",
+          "name": "Methanol",
+          "z": 0.5,
+          "fit": {
+            "A": 8.08097,
+            "B": 1582.271,
+            "C": 239.726,
+            "tUnit": "C",
+            "pUnit": "mmHg",
+            "logBase": "10",
+            "minC": 14.9,
+            "maxC": 83.7,
+            "source": "Table B.4, user-provided image"
+          }
+        },
+        {
+          "id": "b4-ethanol",
+          "name": "Ethanol",
+          "z": 0.5,
+          "fit": {
+            "A": 8.1122,
+            "B": 1592.864,
+            "C": 226.184,
+            "tUnit": "C",
+            "pUnit": "mmHg",
+            "logBase": "10",
+            "minC": 19.6,
+            "maxC": 93.4,
+            "source": "Table B.4, user-provided image",
+            "starred": false
+          }
+        }
+      ],
+      "state": {
+        "T_C": 62.5,
+        "P_kPa": 70,
+        "totalMoles": 100
+      },
+      "z": [
+        0.5,
+        0.5
+      ],
+      "commonValidIntervalsC": [
+        [
+          19.6,
+          93.4
+        ]
+      ],
+      "preset": {
+        "T": 62.5,
+        "P": 70,
+        "totalMoles": 100,
+        "mode": "txy",
+        "calculation": "bt",
+        "binaryZ": 0.5,
+        "extrapolate": false
+      },
+      "questions": [
+        {
+          "part": "a",
+          "prompt": "Assume an ideal liquid solution and ideal vapor. For equimolar methanol/ethanol at 70.00 kPa, calculate the bubble and dew temperatures."
+        },
+        {
+          "part": "b",
+          "prompt": "At 62.50°C, calculate the bubble and dew pressures for the equimolar composition and classify a 100.0 mol sample at 70.00 kPa."
+        },
+        {
+          "part": "c",
+          "prompt": "At 62.50°C and 70.00 kPa, find the equilibrium liquid/vapor compositions and amounts."
+        },
+        {
+          "part": "d",
+          "prompt": "Construct a T–x–y table at 70.00 kPa for x_M=0,0.20,0.40,0.60,0.80,1.00. State the ideal-solution assumption; do not interpret the calculation as measured real-mixture VLE."
+        }
+      ],
+      "answers": {
+        "pressureAtT": {
+          "psatKPa": [
+            93.42926833433471,
+            52.411877398498454
+          ],
+          "bubbleTermsKPa": [
+            46.714634167167354,
+            26.205938699249227
+          ],
+          "bubblePressureKPa": 72.92057286641658,
+          "bubbleVaporY": [
+            0.6406235213311343,
+            0.35937647866886574
+          ],
+          "dewTermsPerKPa": [
+            0.005351642038025604,
+            0.009539822361225405
+          ],
+          "dewPressureKPa": 67.15256291720354,
+          "dewLiquidX": [
+            0.35937647866886574,
+            0.6406235213311343
+          ]
+        },
+        "temperatureAtP": {
+          "bubble": {
+            "temperatureC": 61.515152197302086,
+            "psatKPa": [
+              89.81872487323606,
+              50.181275120820224
+            ],
+            "partialPressuresKPa": [
+              44.90936243661803,
+              25.090637560410112
+            ],
+            "incipientComposition": [
+              0.6415623205231148,
+              0.35843767943443017
+            ],
+            "residual": -2.9718592031713342e-9,
+            "residualUnit": "kPa",
+            "trace": [
+              {
+                "iteration": 1,
+                "low": 19.6,
+                "high": 83.7,
+                "mid": 51.650000000000006,
+                "residual": -24.224413515315
+              },
+              {
+                "iteration": 2,
+                "low": 51.650000000000006,
+                "high": 83.7,
+                "mid": 67.67500000000001,
+                "residual": 20.002393324235186
+              },
+              {
+                "iteration": 3,
+                "low": 51.650000000000006,
+                "high": 67.67500000000001,
+                "mid": 59.66250000000001,
+                "residual": -5.228182067544935
+              },
+              {
+                "iteration": 4,
+                "low": 59.66250000000001,
+                "high": 67.67500000000001,
+                "mid": 63.66875000000001,
+                "residual": 6.5185770926353825
+              },
+              {
+                "iteration": 5,
+                "low": 59.66250000000001,
+                "high": 63.66875000000001,
+                "mid": 61.665625000000006,
+                "residual": 0.4397605266396738
+              },
+              {
+                "iteration": 6,
+                "low": 59.66250000000001,
+                "high": 61.665625000000006,
+                "mid": 60.66406250000001,
+                "residual": -2.4441561132092886
+              },
+              {
+                "iteration": 7,
+                "low": 60.66406250000001,
+                "high": 61.665625000000006,
+                "mid": 61.16484375,
+                "residual": -1.014858745688585
+              },
+              {
+                "iteration": 8,
+                "low": 61.16484375,
+                "high": 61.665625000000006,
+                "mid": 61.415234375000004,
+                "residual": -0.2907363596689265
+              },
+              {
+                "iteration": 9,
+                "low": 61.415234375000004,
+                "high": 61.665625000000006,
+                "mid": 61.54042968750001,
+                "residual": 0.07371250784984795
+              },
+              {
+                "iteration": 10,
+                "low": 61.415234375000004,
+                "high": 61.54042968750001,
+                "mid": 61.47783203125,
+                "residual": -0.10871147391272018
+              },
+              {
+                "iteration": 11,
+                "low": 61.47783203125,
+                "high": 61.54042968750001,
+                "mid": 61.509130859375006,
+                "residual": -0.01754941323807202
+              },
+              {
+                "iteration": 12,
+                "low": 61.509130859375006,
+                "high": 61.54042968750001,
+                "mid": 61.52478027343751,
+                "residual": 0.028069059350713133
+              },
+              {
+                "iteration": 13,
+                "low": 61.509130859375006,
+                "high": 61.52478027343751,
+                "mid": 61.51695556640625,
+                "residual": 0.005256701743121539
+              },
+              {
+                "iteration": 14,
+                "low": 61.509130859375006,
+                "high": 61.51695556640625,
+                "mid": 61.51304321289063,
+                "residual": -0.006147135991326991
+              },
+              {
+                "iteration": 15,
+                "low": 61.51304321289063,
+                "high": 61.51695556640625,
+                "mid": 61.51499938964844,
+                "residual": -0.0004454121956882773
+              },
+              {
+                "iteration": 16,
+                "low": 61.51499938964844,
+                "high": 61.51695556640625,
+                "mid": 61.515977478027345,
+                "residual": 0.0024055960045075153
+              },
+              {
+                "iteration": 17,
+                "low": 61.51499938964844,
+                "high": 61.515977478027345,
+                "mid": 61.51548843383789,
+                "residual": 0.000980079712320503
+              },
+              {
+                "iteration": 18,
+                "low": 61.51499938964844,
+                "high": 61.51548843383789,
+                "mid": 61.51524391174316,
+                "residual": 0.0002673307102867284
+              },
+              {
+                "iteration": 19,
+                "low": 61.51499938964844,
+                "high": 61.51524391174316,
+                "mid": 61.515121650695804,
+                "residual": -0.00008904150466548799
+              },
+              {
+                "iteration": 20,
+                "low": 61.515121650695804,
+                "high": 61.51524391174316,
+                "mid": 61.51518278121948,
+                "residual": 0.00008914441228569103
+              },
+              {
+                "iteration": 21,
+                "low": 61.515121650695804,
+                "high": 61.51518278121948,
+                "mid": 61.51515221595764,
+                "residual": 5.140618952736986e-8
+              },
+              {
+                "iteration": 22,
+                "low": 61.515121650695804,
+                "high": 61.51515221595764,
+                "mid": 61.51513693332672,
+                "residual": -0.00004449506116088742
+              },
+              {
+                "iteration": 23,
+                "low": 61.51513693332672,
+                "high": 61.51515221595764,
+                "mid": 61.51514457464218,
+                "residual": -0.000022221830434432377
+              },
+              {
+                "iteration": 24,
+                "low": 61.51514457464218,
+                "high": 61.51515221595764,
+                "mid": 61.51514839529991,
+                "residual": -0.000011085212932471222
+              },
+              {
+                "iteration": 25,
+                "low": 61.51514839529991,
+                "high": 61.51515221595764,
+                "mid": 61.51515030562878,
+                "residual": -0.000005516903570423892
+              },
+              {
+                "iteration": 26,
+                "low": 61.51515030562878,
+                "high": 61.51515221595764,
+                "mid": 61.51515126079321,
+                "residual": -0.0000027327486407102697
+              },
+              {
+                "iteration": 27,
+                "low": 61.51515126079321,
+                "high": 61.51515221595764,
+                "mid": 61.51515173837542,
+                "residual": -0.000001340671246907732
+              },
+              {
+                "iteration": 28,
+                "low": 61.51515173837542,
+                "high": 61.51515221595764,
+                "mid": 61.51515197716653,
+                "residual": -6.446326210607367e-7
+              },
+              {
+                "iteration": 29,
+                "low": 61.51515197716653,
+                "high": 61.51515221595764,
+                "mid": 61.51515209656209,
+                "residual": -2.966131518178372e-7
+              },
+              {
+                "iteration": 30,
+                "low": 61.51515209656209,
+                "high": 61.51515221595764,
+                "mid": 61.515152156259866,
+                "residual": -1.2260348114523367e-7
+              },
+              {
+                "iteration": 31,
+                "low": 61.515152156259866,
+                "high": 61.51515221595764,
+                "mid": 61.51515218610875,
+                "residual": -3.559863159807719e-8
+              },
+              {
+                "iteration": 32,
+                "low": 61.51515218610875,
+                "high": 61.51515221595764,
+                "mid": 61.515152201033196,
+                "residual": 7.90373633208219e-9
+              },
+              {
+                "iteration": 33,
+                "low": 61.51515218610875,
+                "high": 61.515152201033196,
+                "mid": 61.51515219357097,
+                "residual": -1.3847426316715428e-8
+              },
+              {
+                "iteration": 34,
+                "low": 61.51515219357097,
+                "high": 61.515152201033196,
+                "mid": 61.515152197302086,
+                "residual": -2.9718592031713342e-9
+              }
+            ],
+            "fitIndices": [
+              0,
+              0
+            ]
+          },
+          "dew": {
+            "temperatureC": 63.47979345441564,
+            "psatKPa": [
+              97.14061158168936,
+              54.713356022337
+            ],
+            "partialPressuresKPa": [
+              35,
+              35
+            ],
+            "incipientComposition": [
+              0.36030244642393594,
+              0.6396975536596782
+            ],
+            "residual": 8.361400460898949e-11,
+            "residualUnit": "dimensionless",
+            "trace": [
+              {
+                "iteration": 1,
+                "low": 19.6,
+                "high": 83.7,
+                "mid": 51.650000000000006,
+                "residual": 0.6836305318039244
+              },
+              {
+                "iteration": 2,
+                "low": 51.650000000000006,
+                "high": 83.7,
+                "mid": 67.67500000000001,
+                "residual": -0.16028026081637525
+              },
+              {
+                "iteration": 3,
+                "low": 51.650000000000006,
+                "high": 67.67500000000001,
+                "mid": 59.66250000000001,
+                "residual": 0.17750487641101875
+              },
+              {
+                "iteration": 4,
+                "low": 59.66250000000001,
+                "high": 67.67500000000001,
+                "mid": 63.66875000000001,
+                "residual": -0.0079448862881224
+              },
+              {
+                "iteration": 5,
+                "low": 59.66250000000001,
+                "high": 63.66875000000001,
+                "mid": 61.665625000000006,
+                "residual": 0.08016659006584215
+              },
+              {
+                "iteration": 6,
+                "low": 61.665625000000006,
+                "high": 63.66875000000001,
+                "mid": 62.66718750000001,
+                "residual": 0.03502137605571698
+              },
+              {
+                "iteration": 7,
+                "low": 62.66718750000001,
+                "high": 63.66875000000001,
+                "mid": 63.167968750000014,
+                "residual": 0.013273432197122403
+              },
+              {
+                "iteration": 8,
+                "low": 63.167968750000014,
+                "high": 63.66875000000001,
+                "mid": 63.41835937500001,
+                "residual": 0.0025989889046029724
+              },
+              {
+                "iteration": 9,
+                "low": 63.41835937500001,
+                "high": 63.66875000000001,
+                "mid": 63.543554687500006,
+                "residual": -0.002689156362145617
+              },
+              {
+                "iteration": 10,
+                "low": 63.41835937500001,
+                "high": 63.543554687500006,
+                "mid": 63.48095703125001,
+                "residual": -0.00004914974577630016
+              },
+              {
+                "iteration": 11,
+                "low": 63.41835937500001,
+                "high": 63.48095703125001,
+                "mid": 63.44965820312501,
+                "residual": 0.0012739013067768479
+              },
+              {
+                "iteration": 12,
+                "low": 63.44965820312501,
+                "high": 63.48095703125001,
+                "mid": 63.465307617187506,
+                "residual": 0.000612121433658519
+              },
+              {
+                "iteration": 13,
+                "low": 63.465307617187506,
+                "high": 63.48095703125001,
+                "mid": 63.47313232421875,
+                "residual": 0.00028142228487171295
+              },
+              {
+                "iteration": 14,
+                "low": 63.47313232421875,
+                "high": 63.48095703125001,
+                "mid": 63.47704467773438,
+                "residual": 0.00011612038323360885
+              },
+              {
+                "iteration": 15,
+                "low": 63.47704467773438,
+                "high": 63.48095703125001,
+                "mid": 63.4790008544922,
+                "residual": 0.00003348134758174304
+              },
+              {
+                "iteration": 16,
+                "low": 63.4790008544922,
+                "high": 63.48095703125001,
+                "mid": 63.4799789428711,
+                "residual": -0.00000783519182834258
+              },
+              {
+                "iteration": 17,
+                "low": 63.4790008544922,
+                "high": 63.4799789428711,
+                "mid": 63.47948989868165,
+                "residual": 0.000012822829686953696
+              },
+              {
+                "iteration": 18,
+                "low": 63.47948989868165,
+                "high": 63.4799789428711,
+                "mid": 63.479734420776374,
+                "residual": 0.000002493756881216669
+              },
+              {
+                "iteration": 19,
+                "low": 63.479734420776374,
+                "high": 63.4799789428711,
+                "mid": 63.47985668182373,
+                "residual": -0.0000026707329843222993
+              },
+              {
+                "iteration": 20,
+                "low": 63.479734420776374,
+                "high": 63.47985668182373,
+                "mid": 63.47979555130006,
+                "residual": -8.849192867366185e-8
+              },
+              {
+                "iteration": 21,
+                "low": 63.479734420776374,
+                "high": 63.47979555130006,
+                "mid": 63.47976498603822,
+                "residual": 0.0000012026315061586246
+              },
+              {
+                "iteration": 22,
+                "low": 63.47976498603822,
+                "high": 63.47979555130006,
+                "mid": 63.47978026866914,
+                "residual": 5.570695464918174e-7
+              },
+              {
+                "iteration": 23,
+                "low": 63.47978026866914,
+                "high": 63.47979555130006,
+                "mid": 63.479787909984594,
+                "residual": 2.342887475137445e-7
+              },
+              {
+                "iteration": 24,
+                "low": 63.479787909984594,
+                "high": 63.47979555130006,
+                "mid": 63.479791730642326,
+                "residual": 7.289839332180748e-8
+              },
+              {
+                "iteration": 25,
+                "low": 63.479791730642326,
+                "high": 63.47979555130006,
+                "mid": 63.479793640971195,
+                "residual": -7.796772338863889e-9
+              },
+              {
+                "iteration": 26,
+                "low": 63.479791730642326,
+                "high": 63.479793640971195,
+                "mid": 63.47979268580676,
+                "residual": 3.255081115760561e-8
+              },
+              {
+                "iteration": 27,
+                "low": 63.47979268580676,
+                "high": 63.479793640971195,
+                "mid": 63.479793163388976,
+                "residual": 1.237701940937086e-8
+              },
+              {
+                "iteration": 28,
+                "low": 63.479793163388976,
+                "high": 63.479793640971195,
+                "mid": 63.479793402180086,
+                "residual": 2.290122980141973e-9
+              },
+              {
+                "iteration": 29,
+                "low": 63.479793402180086,
+                "high": 63.479793640971195,
+                "mid": 63.479793521575644,
+                "residual": -2.753324235271748e-9
+              },
+              {
+                "iteration": 30,
+                "low": 63.479793402180086,
+                "high": 63.479793521575644,
+                "mid": 63.47979346187786,
+                "residual": -2.316000724533751e-10
+              },
+              {
+                "iteration": 31,
+                "low": 63.479793402180086,
+                "high": 63.47979346187786,
+                "mid": 63.47979343202897,
+                "residual": 1.0292617869112064e-9
+              },
+              {
+                "iteration": 32,
+                "low": 63.47979343202897,
+                "high": 63.47979346187786,
+                "mid": 63.479793446953416,
+                "residual": 3.988307462066132e-10
+              },
+              {
+                "iteration": 33,
+                "low": 63.479793446953416,
+                "high": 63.47979346187786,
+                "mid": 63.47979345441564,
+                "residual": 8.361400460898949e-11
+              }
+            ],
+            "fitIndices": [
+              0,
+              0
+            ]
+          }
+        },
+        "flashAtState": {
+          "phase": "two-phase",
+          "K": [
+            1.3347038333476386,
+            0.748741105692835
+          ],
+          "beta": 0.4961213027654594,
+          "x": [
+            0.42879671769025307,
+            0.5712032823097228
+          ],
+          "y": [
+            0.572316622828066,
+            0.4276833771719585
+          ],
+          "vaporMoles": 49.61213027654594,
+          "liquidMoles": 50.38786972345406,
+          "componentLiquidMoles": [
+            21.606153148821182,
+            28.781716574631666
+          ],
+          "componentVaporMoles": [
+            28.393846851178814,
+            21.218283425368337
+          ],
+          "sumX": 0.9999999999999759,
+          "sumY": 1.0000000000000244,
+          "balanceError": 5.551115123125783e-17,
+          "trace": [
+            {
+              "iteration": 1,
+              "low": 0,
+              "high": 1,
+              "mid": 0.5,
+              "residual": -0.00031957344722177705
+            },
+            {
+              "iteration": 2,
+              "low": 0,
+              "high": 0.5,
+              "mid": 0.25,
+              "residual": 0.020380106083642296
+            },
+            {
+              "iteration": 3,
+              "low": 0.25,
+              "high": 0.5,
+              "mid": 0.375,
+              "residual": 0.009991485432183617
+            },
+            {
+              "iteration": 4,
+              "low": 0.375,
+              "high": 0.5,
+              "mid": 0.4375,
+              "residual": 0.0048312856528222314
+            },
+            {
+              "iteration": 5,
+              "low": 0.4375,
+              "high": 0.5,
+              "mid": 0.46875,
+              "residual": 0.0022553115588711814
+            },
+            {
+              "iteration": 6,
+              "low": 0.46875,
+              "high": 0.5,
+              "mid": 0.484375,
+              "residual": 0.0009678106492076177
+            },
+            {
+              "iteration": 7,
+              "low": 0.484375,
+              "high": 0.5,
+              "mid": 0.4921875,
+              "residual": 0.00032411371122872956
+            },
+            {
+              "iteration": 8,
+              "low": 0.4921875,
+              "high": 0.5,
+              "mid": 0.49609375,
+              "residual": 0.000002270123441450167
+            },
+            {
+              "iteration": 9,
+              "low": 0.49609375,
+              "high": 0.5,
+              "mid": 0.498046875,
+              "residual": -0.0001586515122974641
+            },
+            {
+              "iteration": 10,
+              "low": 0.49609375,
+              "high": 0.498046875,
+              "mid": 0.4970703125,
+              "residual": -0.00007819067599648677
+            },
+            {
+              "iteration": 11,
+              "low": 0.49609375,
+              "high": 0.4970703125,
+              "mid": 0.49658203125,
+              "residual": -0.000037960274040488295
+            },
+            {
+              "iteration": 12,
+              "low": 0.49609375,
+              "high": 0.49658203125,
+              "mid": 0.496337890625,
+              "residual": -0.000017845075036604374
+            },
+            {
+              "iteration": 13,
+              "low": 0.49609375,
+              "high": 0.496337890625,
+              "mid": 0.4962158203125,
+              "residual": -0.000007787475768877838
+            },
+            {
+              "iteration": 14,
+              "low": 0.49609375,
+              "high": 0.4962158203125,
+              "mid": 0.49615478515625,
+              "residual": -0.0000027586761611742006
+            },
+            {
+              "iteration": 15,
+              "low": 0.49609375,
+              "high": 0.49615478515625,
+              "mid": 0.496124267578125,
+              "residual": -2.4427635980650564e-7
+            },
+            {
+              "iteration": 16,
+              "low": 0.49609375,
+              "high": 0.496124267578125,
+              "mid": 0.4961090087890625,
+              "residual": 0.0000010129235407663195
+            },
+            {
+              "iteration": 17,
+              "low": 0.4961090087890625,
+              "high": 0.496124267578125,
+              "mid": 0.49611663818359375,
+              "residual": 3.8432359047990694e-7
+            },
+            {
+              "iteration": 18,
+              "low": 0.49611663818359375,
+              "high": 0.496124267578125,
+              "mid": 0.4961204528808594,
+              "residual": 7.002361535057844e-8
+            },
+            {
+              "iteration": 19,
+              "low": 0.4961204528808594,
+              "high": 0.496124267578125,
+              "mid": 0.4961223602294922,
+              "residual": -8.71263722279636e-8
+            },
+            {
+              "iteration": 20,
+              "low": 0.4961204528808594,
+              "high": 0.4961223602294922,
+              "mid": 0.4961214065551758,
+              "residual": -8.55137843869258e-9
+            },
+            {
+              "iteration": 21,
+              "low": 0.4961204528808594,
+              "high": 0.4961214065551758,
+              "mid": 0.4961209297180176,
+              "residual": 3.073611845594293e-8
+            },
+            {
+              "iteration": 22,
+              "low": 0.4961209297180176,
+              "high": 0.4961214065551758,
+              "mid": 0.4961211681365967,
+              "residual": 1.1092369994747386e-8
+            },
+            {
+              "iteration": 23,
+              "low": 0.4961211681365967,
+              "high": 0.4961214065551758,
+              "mid": 0.49612128734588623,
+              "residual": 1.270495764149615e-9
+            },
+            {
+              "iteration": 24,
+              "low": 0.49612128734588623,
+              "high": 0.4961214065551758,
+              "mid": 0.496121346950531,
+              "residual": -3.640441309515907e-9
+            },
+            {
+              "iteration": 25,
+              "low": 0.49612128734588623,
+              "high": 0.496121346950531,
+              "mid": 0.4961213171482086,
+              "residual": -1.1849727865609339e-9
+            },
+            {
+              "iteration": 26,
+              "low": 0.49612128734588623,
+              "high": 0.4961213171482086,
+              "mid": 0.4961213022470474,
+              "residual": 4.276148879434061e-11
+            },
+            {
+              "iteration": 27,
+              "low": 0.4961213022470474,
+              "high": 0.4961213171482086,
+              "mid": 0.496121309697628,
+              "residual": -5.711056627610844e-10
+            },
+            {
+              "iteration": 28,
+              "low": 0.4961213022470474,
+              "high": 0.496121309697628,
+              "mid": 0.4961213059723377,
+              "residual": -2.641720731055841e-10
+            },
+            {
+              "iteration": 29,
+              "low": 0.4961213022470474,
+              "high": 0.4961213059723377,
+              "mid": 0.4961213041096926,
+              "residual": -1.1070527827783394e-10
+            },
+            {
+              "iteration": 30,
+              "low": 0.4961213022470474,
+              "high": 0.4961213041096926,
+              "mid": 0.49612130317837,
+              "residual": -3.3971908619534474e-11
+            },
+            {
+              "iteration": 31,
+              "low": 0.4961213022470474,
+              "high": 0.49612130317837,
+              "mid": 0.4961213027127087,
+              "residual": 4.3947900874030665e-12
+            },
+            {
+              "iteration": 32,
+              "low": 0.4961213027127087,
+              "high": 0.49612130317837,
+              "mid": 0.49612130294553936,
+              "residual": -1.4788559266065704e-11
+            },
+            {
+              "iteration": 33,
+              "low": 0.4961213027127087,
+              "high": 0.49612130294553936,
+              "mid": 0.49612130282912403,
+              "residual": -5.1968984671191265e-12
+            },
+            {
+              "iteration": 34,
+              "low": 0.4961213027127087,
+              "high": 0.49612130282912403,
+              "mid": 0.4961213027709164,
+              "residual": -4.0104031207022217e-13
+            },
+            {
+              "iteration": 35,
+              "low": 0.4961213027127087,
+              "high": 0.4961213027709164,
+              "mid": 0.49612130274181254,
+              "residual": 1.996902643242038e-12
+            },
+            {
+              "iteration": 36,
+              "low": 0.49612130274181254,
+              "high": 0.4961213027709164,
+              "mid": 0.49612130275636446,
+              "residual": 7.979172877981e-13
+            },
+            {
+              "iteration": 37,
+              "low": 0.49612130275636446,
+              "high": 0.4961213027709164,
+              "mid": 0.4961213027636404,
+              "residual": 1.9845236565174673e-13
+            },
+            {
+              "iteration": 38,
+              "low": 0.4961213027636404,
+              "high": 0.4961213027709164,
+              "mid": 0.4961213027672784,
+              "residual": -1.0130785099704553e-13
+            },
+            {
+              "iteration": 39,
+              "low": 0.4961213027636404,
+              "high": 0.4961213027672784,
+              "mid": 0.4961213027654594,
+              "residual": 4.85722573273506e-14
+            }
+          ]
+        },
+        "PxyTable": [
+          {
+            "x": 0,
+            "y": 0,
+            "P_kPa": 52.411877398498454,
+            "T_C": 62.5
+          },
+          {
+            "x": 0.2,
+            "y": 0.30826930711408324,
+            "P_kPa": 60.61535558566571,
+            "T_C": 62.5
+          },
+          {
+            "x": 0.4,
+            "y": 0.5430447638374076,
+            "P_kPa": 68.81883377283296,
+            "T_C": 62.5
+          },
+          {
+            "x": 0.6,
+            "y": 0.72780937853064,
+            "P_kPa": 77.0223119600002,
+            "T_C": 62.5
+          },
+          {
+            "x": 0.8,
+            "y": 0.8770046547928887,
+            "P_kPa": 85.22579014716746,
+            "T_C": 62.5
+          },
+          {
+            "x": 1,
+            "y": 1,
+            "P_kPa": 93.42926833433471,
+            "T_C": 62.5
+          }
+        ],
+        "TxyTable": [
+          {
+            "x": 0,
+            "y": 0,
+            "P_kPa": 70,
+            "T_C": 69.22819006285864
+          },
+          {
+            "x": 0.2,
+            "y": 0.30533209807016914,
+            "P_kPa": 70,
+            "T_C": 65.90681103090179
+          },
+          {
+            "x": 0.4,
+            "y": 0.542628227716072,
+            "P_kPa": 70,
+            "T_C": 62.90796082431335
+          },
+          {
+            "x": 0.6,
+            "y": 0.7297163878484852,
+            "P_kPa": 70,
+            "T_C": 60.186687804403505
+          },
+          {
+            "x": 0.8,
+            "y": 0.879172211672366,
+            "P_kPa": 70,
+            "T_C": 57.705044888914564
+          },
+          {
+            "x": 1,
+            "y": 0.9999999999893875,
+            "P_kPa": 70,
+            "T_C": 55.43113788897172
+          }
+        ]
+      },
+      "verification": {
+        "allRequestedTemperaturesSupported": true,
+        "extrapolationsUsed": 0,
+        "phaseAtBothComputedBoundariesCorrect": true,
+        "fullBinaryPxyGapCount": 0,
+        "fullBinaryTxyGapCount": 0
+      }
+    },
+    {
+      "id": "water",
+      "title": "Liquid-water vapor pressure from Table B.3",
+      "componentIds": [
+        "water-table-b3"
+      ],
+      "components": [
+        {
+          "id": "water-table-b3",
+          "name": "Water — Table B.3",
+          "z": 1,
+          "model": "table",
+          "minC": 0,
+          "maxC": 101.9
+        }
+      ],
+      "z": [
+        1
+      ],
+      "state": {
+        "T_C": 25,
+        "P_kPa": 101.325,
+        "totalMoles": 1
+      },
+      "commonValidIntervalsC": [
+        [
+          0,
+          101.9
+        ]
+      ],
+      "preset": {
+        "T": 25,
+        "P": 101.325,
+        "totalMoles": 1,
+        "mode": "psat",
+        "calculation": "bp",
+        "extrapolate": false
+      },
+      "questions": [
+        {
+          "part": "a",
+          "prompt": "Use the liquid-water portion of Table B.3 to read the saturation pressure at 4.3°C and at 25.0°C. Report each pressure in mmHg and kPa."
+        },
+        {
+          "part": "b",
+          "prompt": "Estimate the saturation pressure at 25.35°C by linear interpolation between the 25.3°C and 25.4°C entries. Show the temperature fraction and pressure increment."
+        },
+        {
+          "part": "c",
+          "prompt": "Using Table B.3, find the saturation temperature at 101.325 kPa (=760.00 mmHg). Explain why the pure-fluid bubble and dew temperatures coincide."
+        },
+        {
+          "part": "d",
+          "prompt": "Classify water at 25°C and 101.325 kPa. At 100°C and the same pressure, can temperature and pressure alone determine how much is liquid and how much is vapor?"
+        }
+      ],
+      "answers": {
+        "lookups": [
+          {
+            "T_C": 4.3,
+            "P_kPa": 0.830598355263158,
+            "P_mmHg": 6.23,
+            "interpolation": {
+              "lower": {
+                "T": 4.3,
+                "PmmHg": 6.23,
+                "printedMmHg": "6.230",
+                "P": 0.830598355263158
+              },
+              "upper": {
+                "T": 4.3,
+                "PmmHg": 6.23,
+                "printedMmHg": "6.230",
+                "P": 0.830598355263158
+              },
+              "fraction": 0,
+              "exact": true,
+              "skippedEntries": []
+            }
+          },
+          {
+            "T_C": 25,
+            "P_kPa": 3.1672061842105266,
+            "P_mmHg": 23.756,
+            "interpolation": {
+              "lower": {
+                "T": 25,
+                "PmmHg": 23.756,
+                "printedMmHg": "23.756",
+                "P": 3.1672061842105266
+              },
+              "upper": {
+                "T": 25,
+                "PmmHg": 23.756,
+                "printedMmHg": "23.756",
+                "P": 3.1672061842105266
+              },
+              "fraction": 0,
+              "exact": true,
+              "skippedEntries": []
+            }
+          },
+          {
+            "T_C": 25.35,
+            "P_kPa": 3.233600723684211,
+            "P_mmHg": 24.254,
+            "interpolation": {
+              "lower": {
+                "T": 25.3,
+                "PmmHg": 24.182,
+                "printedMmHg": "24.182",
+                "P": 3.2240015131578947
+              },
+              "upper": {
+                "T": 25.4,
+                "PmmHg": 24.326,
+                "printedMmHg": "24.326",
+                "P": 3.2431999342105264
+              },
+              "fraction": 0.5000000000000178,
+              "exact": false,
+              "skippedEntries": []
+            }
+          },
+          {
+            "T_C": 100,
+            "P_kPa": 101.325,
+            "P_mmHg": 760,
+            "interpolation": {
+              "lower": {
+                "T": 100,
+                "PmmHg": 760,
+                "printedMmHg": "760.00",
+                "P": 101.325
+              },
+              "upper": {
+                "T": 100,
+                "PmmHg": 760,
+                "printedMmHg": "760.00",
+                "P": 101.325
+              },
+              "fraction": 0,
+              "exact": true,
+              "skippedEntries": []
+            }
+          }
+        ],
+        "saturationTemperatureC": 100.00000000172878,
+        "saturationTrace": [
+          {
+            "iteration": 1,
+            "low": 0,
+            "high": 101.9,
+            "mid": 50.95,
+            "residual": -88.39732988486843
+          },
+          {
+            "iteration": 2,
+            "low": 50.95,
+            "high": 101.9,
+            "mid": 76.42500000000001,
+            "residual": -60.42203067434209
+          },
+          {
+            "iteration": 3,
+            "low": 76.42500000000001,
+            "high": 101.9,
+            "mid": 89.16250000000001,
+            "residual": -33.424617705592084
+          },
+          {
+            "iteration": 4,
+            "low": 89.16250000000001,
+            "high": 101.9,
+            "mid": 95.53125,
+            "residual": -15.143587870065787
+          },
+          {
+            "iteration": 5,
+            "low": 95.53125,
+            "high": 101.9,
+            "mid": 98.715625,
+            "residual": -4.563707997532887
+          },
+          {
+            "iteration": 6,
+            "low": 98.715625,
+            "high": 101.9,
+            "mid": 100.30781250000001,
+            "residual": 1.1204495168585993
+          },
+          {
+            "iteration": 7,
+            "low": 98.715625,
+            "high": 100.30781250000001,
+            "mid": 99.51171875,
+            "residual": -1.7553139699835612
+          },
+          {
+            "iteration": 8,
+            "low": 99.51171875,
+            "high": 100.30781250000001,
+            "mid": 99.909765625,
+            "residual": -0.32602006193462785
+          },
+          {
+            "iteration": 9,
+            "low": 99.909765625,
+            "high": 100.30781250000001,
+            "mid": 100.10878906250001,
+            "residual": 0.39462639866884786
+          },
+          {
+            "iteration": 10,
+            "low": 99.909765625,
+            "high": 100.10878906250001,
+            "mid": 100.00927734375,
+            "residual": 0.03364306640625614
+          },
+          {
+            "iteration": 11,
+            "low": 99.909765625,
+            "high": 100.00927734375,
+            "mid": 99.959521484375,
+            "residual": -0.14625034163626083
+          },
+          {
+            "iteration": 12,
+            "low": 99.959521484375,
+            "high": 100.00927734375,
+            "mid": 99.9843994140625,
+            "residual": -0.05636548148709153
+          },
+          {
+            "iteration": 13,
+            "low": 99.9843994140625,
+            "high": 100.00927734375,
+            "mid": 99.99683837890625,
+            "residual": -0.011423051412492669
+          },
+          {
+            "iteration": 14,
+            "low": 99.99683837890625,
+            "high": 100.00927734375,
+            "mid": 100.00305786132813,
+            "residual": 0.011088931756290776
+          },
+          {
+            "iteration": 15,
+            "low": 99.99683837890625,
+            "high": 100.00305786132813,
+            "mid": 99.99994812011718,
+            "residual": -0.00018744389385005888
+          },
+          {
+            "iteration": 16,
+            "low": 99.99994812011718,
+            "high": 100.00305786132813,
+            "mid": 100.00150299072266,
+            "residual": 0.005450398093771014
+          },
+          {
+            "iteration": 17,
+            "low": 99.99994812011718,
+            "high": 100.00150299072266,
+            "mid": 100.00072555541992,
+            "residual": 0.002631131262518238
+          },
+          {
+            "iteration": 18,
+            "low": 99.99994812011718,
+            "high": 100.00072555541992,
+            "mid": 100.00033683776854,
+            "residual": 0.001221497846870534
+          },
+          {
+            "iteration": 19,
+            "low": 99.99994812011718,
+            "high": 100.00033683776854,
+            "mid": 100.00014247894286,
+            "residual": 0.0005166811390608927
+          },
+          {
+            "iteration": 20,
+            "low": 99.99994812011718,
+            "high": 100.00014247894286,
+            "mid": 100.00004529953003,
+            "residual": 0.00016427278518449384
+          },
+          {
+            "iteration": 21,
+            "low": 99.99994812011718,
+            "high": 100.00004529953003,
+            "mid": 99.9999967098236,
+            "residual": -0.000011887526369491752
+          },
+          {
+            "iteration": 22,
+            "low": 99.9999967098236,
+            "high": 100.00004529953003,
+            "mid": 100.00002100467682,
+            "residual": 0.00007617069672960497
+          },
+          {
+            "iteration": 23,
+            "low": 99.9999967098236,
+            "high": 100.00002100467682,
+            "mid": 100.00000885725021,
+            "residual": 0.000032119652445317115
+          },
+          {
+            "iteration": 24,
+            "low": 99.9999967098236,
+            "high": 100.00000885725021,
+            "mid": 100.0000027835369,
+            "residual": 0.000010094130317384042
+          },
+          {
+            "iteration": 25,
+            "low": 99.9999967098236,
+            "high": 100.0000027835369,
+            "mid": 99.99999974668026,
+            "residual": -9.15253394850879e-7
+          },
+          {
+            "iteration": 26,
+            "low": 99.99999974668026,
+            "high": 100.0000027835369,
+            "mid": 100.00000126510858,
+            "residual": 0.000004587749799611629
+          },
+          {
+            "iteration": 27,
+            "low": 99.99999974668026,
+            "high": 100.00000126510858,
+            "mid": 100.00000050589442,
+            "residual": 0.000001834559554936277
+          },
+          {
+            "iteration": 28,
+            "low": 99.99999974668026,
+            "high": 100.00000050589442,
+            "mid": 100.00000012628735,
+            "residual": 4.579644468094557e-7
+          },
+          {
+            "iteration": 29,
+            "low": 99.99999974668026,
+            "high": 100.00000012628735,
+            "mid": 99.9999999364838,
+            "residual": -2.2948631794861285e-7
+          },
+          {
+            "iteration": 30,
+            "low": 99.9999999364838,
+            "high": 100.00000012628735,
+            "mid": 100.00000003138558,
+            "residual": 1.1381568754131877e-7
+          },
+          {
+            "iteration": 31,
+            "low": 99.9999999364838,
+            "high": 100.00000003138558,
+            "mid": 99.99999998393469,
+            "residual": -5.8044562933901034e-8
+          },
+          {
+            "iteration": 32,
+            "low": 99.99999998393469,
+            "high": 100.00000003138558,
+            "mid": 100.00000000766013,
+            "residual": 2.7778469302575104e-8
+          },
+          {
+            "iteration": 33,
+            "low": 99.99999998393469,
+            "high": 100.00000000766013,
+            "mid": 99.99999999579741,
+            "residual": -1.5184113522082043e-8
+          },
+          {
+            "iteration": 34,
+            "low": 99.99999999579741,
+            "high": 100.00000000766013,
+            "mid": 100.00000000172878,
+            "residual": 6.26918961188494e-9
+          }
+        ],
+        "phaseAt25C": "liquid",
+        "phaseAt100C": "indeterminate",
+        "vaporFractionAt100C": null,
+        "explanation": "At 25°C, total pressure exceeds the pure-water saturation pressure, so the equilibrium state is liquid. At the saturation state, liquid and vapor have the same composition (pure water); another independent quantity, such as specific volume or total enthalpy, is needed to determine their amounts."
+      },
+      "verification": {
+        "allRequestedTemperaturesSupported": true,
+        "extrapolationsUsed": 0,
+        "flaggedTableEntriesUsed": 0
+      }
+    }
+  ]
+}

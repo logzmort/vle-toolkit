@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data: blob:; connect-src 'none'; base-uri 'none'; object-src 'none'">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="An offline educational toolkit for ideal vapor–liquid equilibrium, Antoine vapor pressures, bubble and dew points, and transparent worked calculations.">
+  <title>VLE Toolkit · Explore, calculate, understand</title>
+  <link rel="stylesheet" href="toolkit.css">
+</head>
+<body>
+<noscript><p>This interactive toolkit needs JavaScript enabled in your browser. All calculations and property data are contained in this file.</p></noscript>
+<div class="app-shell">
+  <header class="masthead">
+    <div><div class="eyebrow">THERMODYNAMICS / INTERACTIVE LAB</div><h1>Vapor–liquid equilibrium<span class="title-dot">.</span></h1><p class="intro">Build a mixture. Explore its phase boundaries. See the mathematics behind every point.</p></div>
+    <div class="header-actions"><button class="button quiet" id="save-problem">Save problem</button><button class="button quiet" id="load-problem">Open problem</button><button class="button quiet" id="theme-button" aria-label="Switch color theme">Dark theme</button><input type="file" id="problem-file" accept=".json,application/json" hidden></div>
+  </header>
+  <div class="workspace">
+    <aside class="setup" id="setup">
+      <div class="section-heading"><span class="eyebrow">01 / DEFINE</span><h2>Your problem</h2></div>
+      <label>Practice preset<select id="example"><option value="class3">1 · Aromatic mixture</option><option value="binary">2 · Benzene + toluene</option><option value="alkanes">3 · Three alkanes</option><option value="alcohols">4 · Methanol + ethanol</option><option value="water">5 · Pure water</option><option value="custom">Custom problem</option></select></label>
+      <label class="spaced">Problem name<input id="problem-title" type="text" maxlength="90" value="1 · Aromatic mixture"></label>
+      <div class="subheading"><h3>Mixture</h3><span id="component-count" class="small muted"></span></div>
+      <label>Composition entry<select id="basis"><option value="fraction">Mole fractions (sum to 1)</option><option value="moles">Relative molar amounts</option></select></label>
+      <div id="mixture-rows" class="mixture-rows"></div>
+      <div class="between"><span class="small" id="composition-sum"></span><button class="text-button" id="normalize">Normalize</button></div>
+      <div class="add-species"><label class="sr-only" for="new-species">Species to add</label><select id="new-species"></select><button class="button" id="add-species">Add</button></div>
+      <p class="small muted">Choose a library species or add your own. Open <b>Antoine data</b> to edit coefficients, units, and valid ranges.</p>
+      <hr>
+      <div class="subheading"><h3>Display units</h3></div>
+      <div class="two-col"><label>Temperature<select id="temperature-unit"><option value="C">°C</option><option value="K">K</option><option value="F">°F</option></select></label><label>Pressure<select id="pressure-unit"><option>kPa</option><option>bar</option><option>atm</option><option>mmHg</option><option>Pa</option><option>MPa</option></select></label></div>
+      <label class="spaced">Total feed amount (mol)<input type="number" min="0.000001" step="any" id="feed-moles" value="1"></label>
+      <div class="model-badge"><span class="status-dot"></span>Ideal Raoult’s law</div>
+      <p class="small muted">Ideal liquid and vapor; no activity coefficients, fugacity corrections, or solid phases. <button class="text-button inline" data-panel="model">Model &amp; data notes</button></p>
+      <div id="library-warning" class="notice small" hidden></div>
+    </aside>
+    <main>
+      <section class="visual-section" aria-labelledby="explore-heading">
+        <div class="section-heading between"><div><span class="eyebrow">02 / EXPLORE</span><h2 id="explore-heading">The phase map</h2></div><a class="mobile-setup button quiet" href="#setup">Edit mixture</a></div>
+        <nav class="diagram-nav" aria-label="Diagram"><button class="diagram-tab active" data-mode="pt" aria-pressed="true">P–T envelope</button><button class="diagram-tab" data-mode="pxy" aria-pressed="false">P–x–y</button><button class="diagram-tab" data-mode="txy" aria-pressed="false">T–x–y</button><button class="diagram-tab" data-mode="psat" aria-pressed="false">Vapor pressures</button></nav>
+        <div class="binary-controls" id="binary-controls" hidden><div class="three-col"><label>Component A<select id="pair-a"></select></label><label>Component B<select id="pair-b"></select></label><label>Binary overall zA<input type="number" id="binary-z" min="0" max="1" step="0.01"></label></div><input class="slider" id="binary-slider" type="range" min="0" max="1" step="0.005" aria-label="Binary overall mole fraction"><p class="small muted">Binary diagrams use only this pair, with an independent composition. Other mixture components are excluded.</p></div>
+        <div class="operating-controls">
+          <div class="state-input"><div class="between"><label for="temperature" id="temperature-label">Temperature (°C)</label><span class="small muted">selected state</span></div><input type="number" id="temperature" step="any"><input class="slider" type="range" id="temperature-slider" aria-label="Adjust selected temperature"></div>
+          <div class="state-input"><div class="between"><label for="pressure" id="pressure-label">Pressure (kPa)</label><span class="small muted">absolute</span></div><input type="number" id="pressure" min="0" step="any"><input class="slider" type="range" id="pressure-slider" min="0" max="1000" step="1" aria-label="Adjust selected pressure"></div>
+        </div>
+        <div id="input-error" class="notice error" role="alert" hidden></div>
+        <div class="plot-toolbar"><div class="plot-description"><h3 id="plot-title">P–T envelope</h3><span class="small muted" id="plot-subtitle"></span></div><div class="toolbar-actions"><button class="button small-button" id="fit-view">Fit all boundaries</button><button class="button small-button" id="plot-options" aria-expanded="false" aria-controls="plot-settings">Plot settings</button><button class="text-button" id="download-svg">Save SVG</button></div></div>
+        <div id="plot-settings" class="plot-settings" hidden>
+          <div class="three-col"><label>Temperature coverage<select id="range-mode"><option value="auto">All supported data</option><option value="custom">Custom temperature interval</option></select></label><label>Pressure axis<select id="pressure-scale"><option value="auto">Auto (linear / log)</option><option value="linear">Linear</option><option value="log">Logarithmic</option></select></label><label>Curve samples<select id="samples"><option value="121">121 · quick</option><option value="241">241 · smooth</option><option value="481">481 · detailed</option></select></label></div>
+          <div class="two-col spaced" id="temperature-range-fields" hidden><label id="t-min-label">Minimum T<input type="number" id="t-min" step="any"></label><label id="t-max-label">Maximum T<input type="number" id="t-max" step="any"></label></div>
+          <div class="three-col spaced"><label>Vertical range<select id="vertical-range"><option value="auto">Fit curves</option><option value="custom">Custom limits</option></select></label><label id="y-min-label">Minimum<input type="number" id="y-min" step="any"></label><label id="y-max-label">Maximum<input type="number" id="y-max" step="any"></label></div>
+          <div class="check-row"><label class="check"><input type="checkbox" id="include-state">Include selected state in fitted axes</label><label class="check"><input type="checkbox" id="show-pure">Overlay pure-species vapor pressures</label></div>
+          <label class="check"><input type="checkbox" id="extrapolate">Allow illustrative Antoine extrapolation in the custom interval</label><p class="small muted">Extrapolated portions are dotted and labeled. They are outside the fitted data and are not reliable critical-region predictions.</p>
+        </div>
+        <div class="plot-legend" id="plot-legend" aria-label="Plot series"></div>
+        <div id="chart-wrap"><svg id="phase-chart" role="img" aria-label="Interactive phase diagram"></svg><div id="chart-tooltip" role="tooltip" hidden></div><div class="chart-empty" id="chart-empty" hidden></div></div>
+        <div class="plot-footnote"><span id="coverage-note"></span><span id="axis-note"></span></div>
+        <div id="out-of-view" class="notice small" hidden></div>
+        <p class="model-limit small" id="envelope-note">The full <b>supported Antoine range</b> is shown. Raoult’s law does not predict a mixture critical point or close the high-pressure envelope.</p>
+        <div class="result-strip" id="boundary-results"></div>
+        <div class="phase-state" aria-live="polite"><div><span class="small muted">AT YOUR SELECTED T, P &amp; z</span><h3 id="phase-state">—</h3><p class="small" id="phase-description"></p></div><div class="phase-amount"><span id="vapor-amount">—</span><span class="small muted">vapor fraction, β = V/N</span><div class="phase-meter"><div id="phase-meter-fill"></div></div></div></div>
+        <div class="table-wrap"><table class="data-table" id="phase-table"><caption>Overall, liquid, and vapor compositions</caption><thead><tr><th>Species</th><th>Overall zᵢ</th><th>Liquid xᵢ</th><th>Vapor yᵢ</th><th>Kᵢ</th></tr></thead><tbody></tbody></table></div>
+      </section>
+      <section class="learning-section" aria-labelledby="learning-heading">
+        <div class="section-heading"><span class="eyebrow">03 / UNDERSTAND</span><h2 id="learning-heading">Follow the mathematics</h2><p class="muted">Every curve is a sequence of equilibrium calculations. Inspect one calculation, or the rows that form the graph.</p></div>
+        <nav class="learning-nav" aria-label="Learning view"><button class="learning-tab active" data-panel="steps" aria-pressed="true">Worked solution</button><button class="learning-tab" data-panel="graph" aria-pressed="false">How this graph is built</button><button class="learning-tab" data-panel="model" aria-pressed="false">Model &amp; data</button></nav>
+        <div id="steps-panel" class="learning-panel">
+          <div class="calculation-choice"><label>Choose a calculation<select id="calculation"><option value="sat">Pure-species vapor pressure · known T</option><option value="bp">Bubble pressure · known T, x</option><option value="dp">Dew pressure · known T, y</option><option value="bt">Bubble temperature · known P, x</option><option value="dt">Dew temperature · known P, y</option><option value="flash">Flash · known T, P, z</option></select></label><button class="button quiet" id="print-solution">Print solution</button></div>
+          <div id="practice-prompt" class="notice info"></div><div id="worked-solution"></div>
+        </div>
+        <div id="graph-panel" class="learning-panel" hidden><div id="graph-explanation"></div><div class="between spaced"><h3>Sampled graph data</h3><button class="button quiet" id="download-csv">Download all rows (CSV)</button></div><p class="small muted" id="graph-data-note"></p><div class="table-wrap"><table class="data-table" id="graph-data-table"></table></div><button class="text-button" id="more-rows">Show more rows</button></div>
+        <div id="model-panel" class="learning-panel" hidden>
+          <div class="explanation-grid"><article><h3>What the model assumes</h3><p>Each species follows <b>yᵢP = xᵢPsatᵢ(T)</b>. The liquid solution and vapor are ideal, and liquid-pressure corrections are neglected.</p><p>Antoine constants describe <em>pure-component vapor pressure</em>. They do not establish that a mixture is ideal or that its liquids are miscible. Activity coefficients, azeotropes, liquid–liquid separation, critical behavior, and solid phases are not predicted.</p></article><article><h3>How data ranges work</h3><p>Each species may have several Antoine fits. The <b>first valid fit</b> is used where fits overlap. The graph breaks at fit changes and unsupported gaps; it never silently fills a missing range.</p><p>A mixture calculation requires a fit for every species with a nonzero mole fraction. Pure endpoints can therefore extend beyond a binary mixture’s shared range. Extrapolation is optional and clearly marked.</p></article></div>
+          <h3 class="spaced">Species data &amp; sources</h3><div id="data-sources"></div>
+          <div class="notice small spaced">Educational tool, not a validated process-design package. Verify the suitability of the thermodynamic model and property data for your system.</div>
+        </div>
+      </section>
+    </main>
+  </div>
+  <footer>VLE Toolkit <span>Single-file · offline · reproducible problems</span></footer>
+</div>
+<dialog id="species-dialog"><form id="species-form"><div class="dialog-header"><div><span class="eyebrow">PROPERTY DATA</span><h2 id="species-dialog-title">Antoine data</h2></div><button class="icon-button" type="button" id="close-species" aria-label="Close species editor">×</button></div><div class="dialog-body"><div class="two-col"><label>Species name<input id="species-name" type="text" maxlength="60" required></label><label>Formula / short label<input id="species-formula" type="text" maxlength="30"></label></div><p class="equation">log₁₀(Psat) or ln(Psat) = A − B / (T + C)</p><p class="small muted">Use the exact log convention and units that accompany your constants. Validity limits below are always in °C. At overlapping temperatures, the first valid fit wins.</p><div id="fit-editors"></div><button class="button" type="button" id="add-fit">+ Add temperature-range fit</button><label class="spaced">Source / notes<textarea id="species-notes" rows="2" maxlength="1500"></textarea></label><div class="notice error" id="species-error" role="alert" hidden></div></div><div class="dialog-footer"><button type="button" class="button quiet" id="cancel-species">Cancel</button><button class="button primary" type="submit">Apply species data</button></div></form></dialog>
+<div class="toast" role="status" id="toast" hidden></div>
+<script src="../vendor/d3-7.9.0.min.js"></script>
+<script src="vle_engine.js"></script>
+<script id="species-library" type="application/json">__SPECIES_LIBRARY__</script>
+<script src="app.js"></script>
+</body>
+</html>
